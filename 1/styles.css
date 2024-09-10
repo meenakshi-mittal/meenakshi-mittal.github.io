@@ -1,0 +1,107 @@
+body {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 18px;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    padding-left: 1in; /* 1-inch left border */
+    padding-right: 1in; /* 1-inch right border */
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+.section {
+    margin-bottom: 40px;
+}
+
+.image-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 40px;
+    flex-wrap: nowrap;
+}
+
+.image-row div {
+    margin: 0 10px;
+}
+
+.image-row img {
+    flex-grow: 1;
+    flex-shrink: 1;
+    width: auto;
+    max-width: 100%;
+    border: 2px solid black;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.image-label {
+    font-size: 18px;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.arrow-right {
+    flex-grow: 0;
+    font-size: 30px;
+    margin: 0 30px;
+}
+
+.arrow-down {
+    text-align: center;
+    font-size: 30px;
+    margin: 10px 0 30px 0;
+}
+
+/* Grid Layout */
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    justify-items: center;
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .button-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .button-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+.button-grid img {
+    width: 100%;
+    border: 2px solid black;
+    border-radius: 8px;
+}
+
+.button-group {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.toggle-button {
+    background-color: gray;
+    color: white;
+    padding: 5px 10px;
+    border: 2px solid black;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px;
+}
+
+.active {
+    background-color: darkgray;
+}

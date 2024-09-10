@@ -7,13 +7,26 @@
     <style>
         body {
             font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
             margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
+            background-color: #607d8b; /* Blue-gray border color */
+        }
+
+        .wrapper {
+            background-color: #bfcbd1; /* White background for the content */
+            max-width: calc(100% - 2in); /* Account for 1-inch borders on both sides */
+            margin: 0 auto; /* Center the content */
+            padding-left: 1in; /* Add the 1-inch padding inside the content */
+            padding-right: 1in; /* Add the 1-inch padding inside the content */
+            box-sizing: border-box; /* Include padding in width calculations */
         }
 
         h1, h2 {
             text-align: center;
+        }
+
+        h3 {
+            font-size: 1.5em; /* You can adjust the size as needed */
         }
 
         .section {
@@ -22,29 +35,43 @@
 
         .image-row {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
             align-items: center;
             margin-bottom: 40px;
+            flex-wrap: nowrap; /* Prevent wrapping of images */
+        }
+
+        .image-row div {
+            margin: 0 10px; /* General margin between the images */
         }
 
         .image-row img {
-            width: 22%;
+            flex-grow: 1; /* Allow images to grow and fill space */
+            flex-shrink: 1; /* Allow images to shrink as needed */
+            width: auto;
+            max-width: 100%;
+            border: 2px solid black;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+
+        .image-label {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 18px;
+            margin-top: 5px;
+            text-align: center;
         }
 
         .arrow-right {
-            width: 5%;
-            text-align: center;
-            font-size: 24px;
+            flex-grow: 0;
+            font-size: 30px;
+            margin: 0 30px; /* Add space around the arrow */
         }
 
         .arrow-down {
             text-align: center;
-            margin: 20px 0;
-        }
-
-        .image-label {
-            text-align: center;
-            margin-top: 10px;
+            font-size: 30px;
+            margin: 10px 0 30px 0; /* Reduce the top margin */
         }
 
         .variation-grid {
@@ -65,145 +92,473 @@
 
         .button-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(3, 1fr); /* 3 images per row */
+            gap: 20px; /* Space between images */
             justify-items: center;
             margin-bottom: 40px;
+            width: 100%;
+            max-width: 100%; /* Maintain 1.5-inch margins on both sides */
+            box-sizing: border-box; /* Ensure padding is included in width calculation */
         }
 
         .button-grid img {
-            width: 100%;
-        }
-
-        .button-group {
-            margin-top: 10px;
-            display: flex;
-            justify-content: center;
-            gap: 5px;
+            width: 100%; /* Make images responsive */
+            height: auto; /* Maintain aspect ratio */
+            max-width: 100%; /* Prevent images from overflowing */
+            border: 2px solid black;
+            border-radius: 8px;
+            object-fit: cover;
         }
 
         .toggle-button {
-            background-color: gray;
+            background-color: #607d8b; /* Blue-gray color */
             color: white;
-            padding: 5px 10px;
-            border: none;
+            padding: 5px 8px;
+            border: 2px solid black;
+            border-radius: 8px;
             cursor: pointer;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            text-align: center; /* Center text inside the button */
+            max-width: 100%; /* Prevent button overflow */
+            white-space: normal; /* Allow text to wrap onto multiple lines */
+            word-wrap: break-word; /* Ensure long words can break and wrap */
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .image-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .image-row img {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-
-            .arrow-right {
-                display: none;
-            }
+        /* Active button style */
+        .active {
+            background-color: #455a64; /* Darker shade of blue-gray for active buttons */
         }
+
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow buttons to wrap if they don't fit */
+            gap: 5px;
+            max-width: 100%;
+        }
+
+        .unbold {
+            font-weight: normal; /* Unbold this specific H2 */
+        }
+
+
+
     </style>
 </head>
 <body>
+<div class="wrapper">
+    <div class="section">
+        <br>
+        <h1>CS 180: Project 1</h1>
+        <h2>Images of the Russian Empire: Colorizing the Prokudin-Gorskii photo collection</h2>
+        <h2 class="unbold">Meenakshi Mittal</h2>
+    </div>
 
     <div class="section">
-        <h1>Project Title</h1>
-        <p>Explanation goes here. Placeholder text for now.</p>
+        <h3>Overview:</h3>
+        <p>
+            Sergei Mikhailovich Prokudin-Gorskii was an early pioneer in color photography.
+            He traveled across the Russian Empire in the early 1900s, capturing thousands of images using his innovative technique of taking three separate exposures through red, green, and blue filters.
+            He hoped that future technology could merge these exposures into vibrant color photographs, but he unfortunately never saw his dream realized.
+        </p>
+        <p>
+            Decades later, The Library of Congress digitized and colorized Sergei's glass plate negatives.
+            In this project, we seek to recreate this work.
+            Here, we digitally reconstruct 17 of the images in the collection by aligning the color channels from the glass plate negatives, producing high-quality color photographs with minimal distortion.
+            Additionally, we experiment with automatic contrasting and white balancing methods.
+        </p>
+        <p>Here is an example of the three color channel glass plate negatives:</p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/overview/r.jpg" alt="Image 1">
+                <p class="image-label">Red Channel</p>
+            </div>
+            <div>
+                <img src="media/overview/g.jpg" alt="Image 2">
+                <p class="image-label">Green Channel</p>
+            </div>
+            <div>
+                <img src="media/overview/b.jpg" alt="Image 3">
+                <p class="image-label">Blue Channel</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Basic Alignment:</h3>
+        <p>
+            Overlaying the three color channels without any alignment results in a color shifted image almost 100% of the time.
+            This can be seen below in the image labelled "Base".
+        </p>
+        <p>
+            My first naive attempt to align the color channels was to hold the blue channel steady, and then apply numpy.roll to the red and green channels over a range of [-20,20] pixels in both the x and y directions.
+            numpy.roll circularly wraps the values of an array around to the other end, which essentially achieves the image "shifting" we are looking for.
+            At each shifted position, we compute how well the current color channel matches the blue channel, and we choose the shift with the best match.
+            I tried two matching metrics: minimizing the Euclidean distance and maximizing the Normalized Cross-Correlation between the two channels.
+            They both gave similar results, so I arbitrarily selected the Euclidean distance approach for the rest of the project.
+            The result of this attempt can be seen in "Naive Translation". The color channels still appear shifted, seemingly even more than we started with.
+        </p>
+        <p>
+            I eventually realized that the borders were affecting the alignment.
+            I believe the solid-colored borders may have had near-perfect matching scores with one another, heavily influencing the total matching score.
+            This is not ideal, because the borders of the channels are not necessarily aligned.
+            My solution to this problem was to crop 20% off the sides of each color channel before computing the Euclidean distance between the channels.
+            This seemed to solve the problem, as can be seen in the image labelled "Cropped Translation".
+        </p>
     </div>
 
     <!-- Base, Naive Translate, Cropped Translate -->
     <div class="section">
         <div class="image-row">
-            <img src="media/base.jpg" alt="Image 1">
-            <img src="media/naive_align.jpg" alt="Image 2">
-            <img src="media/cropped_align.jpg" alt="Image 3">
+            <div>
+                <img src="media/overview/base.jpg" alt="Image 1">
+                <p class="image-label">Base</p>
+            </div>
+            <div>
+                <img src="media/overview/naive_align.jpg" alt="Image 2">
+                <p class="image-label">Naive Translation</p>
+            </div>
+            <div>
+                <img src="media/overview/cropped_align.jpg" alt="Image 3">
+                <p class="image-label">Cropped Translation</p>
+            </div>
         </div>
-        <p class="image-label">Base | Naive Translation | Cropped Translation</p>
     </div>
+
+    <div class="section">
+        <h3>Pyramid Alignment:</h3>
+        <p>
+            Although the above approach works well for smaller images, we run into an issue with large images (i.e., higher resolution / pixel count).
+            Firstly, searching over a 40x40 pixel range will not necessarily find the best alignment in a large image, as 40 pixels may only be a very small percentage of the image size.
+            As we will see later, some of the larger images require close to a 200 pixel shift in one direction.
+            Secondly, as the image size gets larger, computing the Euclidean distance between two channels takes a longer time.
+            Therefore, to use this approach for large images, we must use a large range of shifts, say [-200,200] in both directions, and each shift takes longer to compute.
+            This gives us an unreasonably high compute time per image.
+        </p>
+        <p>
+            To solve this issue, I used a pyramid scaling approach. The algorithm first repeatedly scales the image down by a factor of 2 until it falls within a predetermined size.
+            Then we find the best (x,y) shift over a range of [-20,20] pixels in both directions (very similar to the naive approach). This happens quickly because the image is small.
+            Next, the algorithm "scales" the image up a level (i.e., it rescales the original image down to the level above the current one, as opposed to scaling the current one up).
+            We apply the best shift found in the previous step, multiplied by 2 to account for the scaling up.
+            Now, the algorithm again finds the best (x,y) shift, but this time only over a range of [-2,2] pixels in both directions. We add this shift to the doubled shift from the level below, and this becomes the new best (x,y) shift.
+            The algorithm scales the image up another level, and we repeat the process until the image returns to its original scale.
+        </p>
+        <p>
+            I stopped scaling down once the height or width became less than 500 pixels. This value was chosen after experimenting with a few different ones like 50, 200, and 1000.
+            Scaling the image down too much runs the risk of losing too much information, to the point that the best alignment is no longer obvious.
+            On the other hand, not scaling it down enough increases the runtime.
+        </p>
+        <p>
+            The algorithm checks over the range of [-2,2] pixels in the scaled up images because the best shift from the level below ensures that we are no more than a pixel away from the correct alignment in the level above.
+            I checked over 2 pixels instead of 1 to give the algorithm a margin of error and allow for self-correction.
+        </p>
+        <p>
+            Here is an example of how an image may look at each stage of scaling. (The scaling was exaggerated here for visual effect-- the image here is scaled far below the 500 pixel threshold):
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+            <img src="media/pyramid_scaling/0.0625.jpg" alt="Variation 2">
+                <p class="image-label">1/16</p>
+            </div>
+            <div>
+            <img src="media/pyramid_scaling/0.125.jpg" alt="Variation 4">
+                <p class="image-label">1/8</p>
+            </div>
+            <div>
+            <img src="media/pyramid_scaling/0.25.jpg" alt="Variation 6">
+                <p class="image-label">1/4</p>
+            </div>
+            <div>
+            <img src="media/pyramid_scaling/0.5.jpg" alt="Variation 6">
+                <p class="image-label">1/2</p>
+            </div>
+            <div>
+            <img src="media/pyramid_scaling/1.jpg" alt="Variation 6">
+                <p class="image-label">1/1</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Edge Alignment:</h3>
+        <p>
+            The approach described above-- pyramid scaling with Euclidean distance scoring-- worked for the majority of images.
+            However, the color channels of an image are not always similar enough that Euclidean distance scoring works.
+            Take the following image, where the bright blue clothing appears black in the red channel and white in the blue channel:
+        </p>
+    </div>
+
 
     <!-- First Row of Images with Arrow -->
     <div class="section">
         <div class="image-row">
-            <img src="emir_base/r.jpg" alt="Image 1">
-            <img src="emir_base/g.jpg" alt="Image 2">
-            <img src="emir_base/b.jpg" alt="Image 3">
+            <div>
+                <img src="media/emir_base/r.jpg" alt="Red Channel">
+                <p class="image-label">Red Channel</p>
+            </div>
+            <div>
+                <img src="media/emir_base/g.jpg" alt="Green Channel">
+                <p class="image-label">Green Channel</p>
+            </div>
+            <div>
+                <img src="media/emir_base/b.jpg" alt="Blue Channel">
+                <p class="image-label">Blue Channel</p>
+            </div>
             <div class="arrow-right">→</div>
-            <img src="emir_base/emir.jpg" alt="Image 4">
+            <div>
+                <img src="media/emir_base/emir.jpg" alt="Failed Alignment">
+                <p class="image-label">Failed Alignment</p>
+            </div>
         </div>
-        <p class="image-label">Red Channel | Green Channel | Blue Channel | Failed Alignment</p>
     </div>
 
-    <!-- Arrow Down -->
-    <div class="arrow-down">↓</div>
+    <div class="section">
+        <p>
+            To fix this problem, I performed edge extraction on each of the three color channels using the skimage.filters.prewitt function.
+            Then I applied the previous approach to the edge images to find the best shift.
+            All three channels usually have very similar edges, and this approach successfully aligned all the images I tested.
+            (Please turn up brightness if edges are not visible):
+        </p>
+    </div>
 
     <!-- Second Row of Images with Arrow -->
     <div class="section">
         <div class="image-row">
-            <img src="emir_edges/r.jpg" alt="Image 5">
-            <img src="emir_edges/g.jpg" alt="Image 6">
-            <img src="emir_edges/b.jpg" alt="Image 7">
-            <div class="arrow-right">→</div>
-            <img src="emir_edges/emir.jpg" alt="Image 8">
-        </div>
-        <p class="image-label">Red Channel Edges | Green Channel Edges | Blue Channel Edges | Successful Alignment</p>
-    </div>
-
-    <div class="section">
-        <h2>Image Variations</h2>
-        <div class="variation-grid">
-            <img src="out_base/cathedral.jpg" alt="Variation 1">
-            <img src="out_base_0_1_contrast/cathedral.jpg" alt="Variation 2">
-            <img src="out_histo_eq/cathedral.jpg" alt="Variation 3">
-            <img src="out_adapt_histo_eq/cathedral.jpg" alt="Variation 4">
-            <img src="out_gray_world/cathedral.jpg" alt="Variation 5">
-            <img src="out_avg_world/cathedral.jpg" alt="Variation 6">
-        </div>
-        <p class="variation-label">Label for each variation</p>
-    </div>
-
-    <div class="section">
-        <h2>4 x 4 Image Grid with Toggle</h2>
-        <div class="button-grid">
             <div>
-                <img src="out_base/cathedral.jpg" alt="Grid Image 1" id="image-1">
-                <div class="button-group">
-                    <button class="toggle-button" onclick="toggleImage(1, 1)">Var 1</button>
-                    <button class="toggle-button" onclick="toggleImage(1, 2)">Var 2</button>
-                    <button class="toggle-button" onclick="toggleImage(1, 3)">Var 3</button>
-                    <button class="toggle-button" onclick="toggleImage(1, 4)">Var 4</button>
-                    <button class="toggle-button" onclick="toggleImage(1, 5)">Var 5</button>
-                    <button class="toggle-button" onclick="toggleImage(1, 6)">Var 6</button>
-                </div>
+                <img src="media/emir_edges/r.jpg" alt="Red Channel">
+                <p class="image-label">Red Channel Edges</p>
             </div>
-            <!-- Repeat for the rest of the 4x4 grid -->
+            <div>
+                <img src="media/emir_edges/g.jpg" alt="Green Channel">
+                <p class="image-label">Green Channel Edges</p>
+            </div>
+            <div>
+                <img src="media/emir_edges/b.jpg" alt="Blue Channel">
+                <p class="image-label">Blue Channel Edges</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/emir_edges/emir.jpg" alt="Failed Alignment">
+                <p class="image-label">Successful Alignment</p>
+            </div>
         </div>
     </div>
 
-    <script>
-        const images = {
-            1: [
-                'https://via.placeholder.com/150',
-                'https://via.placeholder.com/150?text=Var+2',
-                'https://via.placeholder.com/150?text=Var+3',
-                'https://via.placeholder.com/150?text=Var+4',
-                'https://via.placeholder.com/150?text=Var+5',
-                'https://via.placeholder.com/150?text=Var+6'
-            ],
-            // Add other image sets for the remaining image IDs
-        };
+    <div class="section">
+        <h3>Bells and Whistles:</h3>
+        <p>
+            After alignment, I tried a few methods of automatic image contrasting and white balancing.
+            <ul>
+                <li><strong>0-1 Contrast:</strong>
+                    <ul>
+                        <li>Rescaling pixel values such that the brightest pixel is 1 and the darkest pixel is 0</li>
+                        <li>This had little to no effect on any of the images</li>
+                    </ul>
+                </li>
+                <li><strong>Histogram Equalization Contrast:</strong>
+                    <ul>
+                        <li>Rescaling pixel values so that the image's histogram is more evenly distributed across all of its values</li>
+                        <li>Calculated using skimage.exposure.equalize_hist function</li>
+                        <li>This tends to increase saturation and contrast-- I think it looks great on 'train', but very harsh on 'church'</li>
+                    </ul>
+                </li>
+                <li><strong>Adaptive Histogram Equalization Contrast:</strong>
+                    <ul>
+                        <li>Dividing image into smaller tiles and applying histogram equalization to each one</li>
+                        <li>Calculated using skimage.exposure.equalize_adapthist function</li>
+                        <li>This tends to significantly increase image definition and somewhat increase contrast</li>
+                        <li>This effect is more subjective in my opinion-- I think it looks great on 'melons' and 'church', but not so good on 'emir'</li>
+                    </ul>
+                </li>
+                <li><strong>Gray World White Balancing:</strong>
+                    <ul>
+                        <li>Rescaling all color channels so that the average color is gray (R:128,G:128,B:128)</li>
+                        <li>I manually implemented this-- gray is 128 in each channel, so we multiply each color channel by 128/color_channel_average</li>
+                        <li>This works quite well for the purpose of white balancing-- it is most noticeable in 'icon' and 'arch'.</li>
+                        <li>It also gives an almost dreamy look to some images, specifically 'church'</li>
+                        <li>It makes some photos very gray, for lack of a better term, such as 'monastery' and 'tobolsk'</li>
+                    </ul>
+                </li>
+                <li><strong>Average World White Balancing:</strong>
+                    <ul>
+                        <li>Rescaling all color channels so that the average of each channel is the average of the image</li>
+                        <li>I manually implemented this-- we take the average of the entire image, then multiply each color channel by image_average/color_channel_average</li>
+                        <li>This has a similar effect to the gray world white balancing, except the brightness of the image tends to match its original brightness.</li>
+                        <li>I like it more than gray world white balancing because it doesn't make the images 'grayer'</li>
+                    </ul>
+                </li>
+            </ul>
+         Here's how all 6 edits look on the 'cathedral' image:
+        </p>
+    </div>
 
-        function toggleImage(imageId, variation) {
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/out_base/cathedral.jpg" alt="Variation 1">
+                <p class="image-label">Base</p>
+            </div>
+            <div>
+                <img src="media/out_histo_eq/cathedral.jpg" alt="Variation 3">
+                <p class="image-label">Histogram Equalization</p>
+            </div>
+            <div>
+            <img src="media/out_gray_world/cathedral.jpg" alt="Variation 5">
+                <p class="image-label">Gray World White Balance</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+            <img src="media/out_0_1_contrast/cathedral.jpg" alt="Variation 2">
+                <p class="image-label">0-1 Contrast</p>
+            </div>
+            <div>
+            <img src="media/out_adapt_histo_eq/cathedral.jpg" alt="Variation 4">
+                <p class="image-label">Adaptive Histogram Equalization</p>
+            </div>
+            <div>
+            <img src="media/out_avg_world/cathedral.jpg" alt="Variation 6">
+                <p class="image-label">Average World White Balance</p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="section">
+        <h3>Results for Provided Images:</h3>
+         <p>Hover your mouse over the buttons below each image to display the edited image.</p>
+        <br>
+        <div id="image-grid" class="button-grid">
+            <!-- Image Blocks Will Be Dynamically Inserted Here -->
+        </div>
+    </div>
+
+    <br>
+
+    <div class="section">
+        <h3>Results for Additional Images:</h3>
+        <div id="special-image-grid" class="button-grid">
+            <!-- Special Image Blocks Will Be Dynamically Inserted Here -->
+        </div>
+    </div>
+    <br>
+    <br>
+</div>
+    <script>
+        const imageNames = [
+            { name: 'self_portrait', label: '[R: (176, 37), G: (78, 29)]' },
+            { name: 'sculpture', label: '[R: (140, -26), G: (33, -11)]' },
+            { name: 'lady', label: '[R: (120, 13), G: (56, 9)]' },
+            { name: 'harvesters', label: '[R: (124, 14), G: (60, 17)]' },
+            { name: 'church', label: '[R: (58, -4), G: (25, 4)]' },
+            { name: 'icon', label: '[R: (90, 23), G: (42, 17)]' },
+            { name: 'onion_church', label: '[R: (107, 36), G: (51, 26)]' },
+            { name: 'melons', label: '[R: (177, 13), G: (80, 10)]' },
+            { name: 'monastery', label: '[R: (3, 2), G: (-3, 2)]' },
+            { name: 'emir', label: '[R: (107, 40), G: (49, 24)]' },
+            { name: 'cathedral', label: '[R: (12, 3), G: (5, 2)]' },
+            { name: 'train', label: '[R: (85, 29), G: (41, 2)]' },
+            { name: 'tobolsk', label: '[R: (7, 3), G: (3, 3)]' },
+            { name: 'three_generations', label: '[R: (111, 9), G: (54, 12)]' }
+        ];
+
+        const specialImageNames = [
+            { name: 'cliff_house', label: '[R: (76, -8), G: (-3, -2)]' },
+            { name: 'canoe', label: '[R: (134, -14), G: (14, -9)]' },
+            { name: 'arch', label: '[R: (154, 34), G: (73, 23)]' }
+        ];
+
+
+        const imageVariations = ['0_1_contrast', 'histo_eq', 'adapt_histo_eq', 'gray_world', 'avg_world'];
+
+        const labels = ['0-1 Contrast (Base)', 'Histogram Equalization', 'Adaptive Histogram Equalization', 'Gray World Balance', 'Avg. World Balance'];
+
+        function createImageBlock(imageId, imageName, label) {
+            const imageContainer = document.createElement('div');
+
+            // Create label for the image with the custom label string
+            const labelElement = document.createElement('p');
+            labelElement.className = 'image-label';
+            labelElement.textContent = `${imageName}: ${label}`; // Use the label string here
+
+
+            const imageElement = document.createElement('img');
+            imageElement.src = `media/out_${imageVariations[0]}/${imageName}.jpg`;
+            imageElement.alt = `Grid Image ${imageId}`;
+            imageElement.id = `image-${imageId}`;
+
+            const buttonGroup = document.createElement('div');
+            buttonGroup.className = 'button-group';
+
+            labels.forEach((label, index) => {
+                const button = document.createElement('button');
+                button.className = 'toggle-button';
+                button.textContent = label;
+                button.setAttribute('onmouseover', `toggleImage(${imageId}, ${index + 1}, this)`); // Pass the button itself
+                buttonGroup.appendChild(button);
+            });
+
+            imageContainer.appendChild(labelElement); // Add label above the image
+            imageContainer.appendChild(imageElement);
+            imageContainer.appendChild(buttonGroup);
+
+            return imageContainer;
+        }
+
+        function populateImageGrid() {
+            const imageGrid = document.getElementById('image-grid');
+            imageNames.forEach((image, index) => {
+                const imageBlock = createImageBlock(index + 1, image.name, image.label); // Pass name and label
+                imageGrid.appendChild(imageBlock);
+            });
+        }
+
+        function populateSpecialImageGrid() {
+            const specialImageGrid = document.getElementById('special-image-grid');
+            specialImageNames.forEach((image, index) => {
+                const imageBlock = createImageBlock(imageNames.length + index + 1, image.name, image.label); // Pass name and label
+                specialImageGrid.appendChild(imageBlock);
+            });
+        }
+
+        // Reset active buttons on all images
+        function resetActiveButtons(imageId) {
+            const buttonGroup = document.querySelector(`#image-${imageId}`).nextElementSibling;
+            buttonGroup.querySelectorAll('.toggle-button').forEach(button => {
+                button.classList.remove('active');
+            });
+        }
+
+        function toggleImage(imageId, variation, button) {
             const imgElement = document.getElementById(`image-${imageId}`);
-            if (images[imageId] && images[imageId][variation - 1]) {
-                imgElement.src = images[imageId][variation - 1];
+            const allImageNames = [...imageNames, ...specialImageNames];
+            if (imgElement) {
+                const imageName = allImageNames[imageId - 1].name;
+                imgElement.src = `media/out_${imageVariations[variation - 1]}/${imageName}.jpg`;
+                resetActiveButtons(imageId); // Reset previously active buttons
+                button.classList.add('active'); // Highlight the current active button
             } else {
-                console.log(`Image or variation not found for ID: ${imageId}, Variation: ${variation}`);
+                console.log(`Image not found for ID: ${imageId}`);
             }
         }
+
+        // Populate the grids on page load
+        window.onload = function () {
+            populateImageGrid();
+            populateSpecialImageGrid();
+        };
+
     </script>
 
 </body>
