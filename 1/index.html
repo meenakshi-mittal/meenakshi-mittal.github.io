@@ -9,16 +9,16 @@
             font-family: 'Times New Roman', Times, serif;
             font-size: 16px;
             margin: 0;
-            background-color: #607d8b; /* Blue-gray border color */
+            background-color: #607d8b;
         }
 
         .wrapper {
-            background-color: #bfcbd1; /* White background for the content */
-            max-width: calc(100% - 2in); /* Account for 1-inch borders on both sides */
-            margin: 0 auto; /* Center the content */
-            padding-left: 1in; /* Add the 1-inch padding inside the content */
-            padding-right: 1in; /* Add the 1-inch padding inside the content */
-            box-sizing: border-box; /* Include padding in width calculations */
+            background-color: #bfcbd1;
+            max-width: calc(100% - 2in);
+            margin: 0 auto;
+            padding-left: 0.5in;
+            padding-right: 0.5in;
+            box-sizing: border-box;
         }
 
         h1, h2 {
@@ -26,7 +26,7 @@
         }
 
         h3 {
-            font-size: 1.5em; /* You can adjust the size as needed */
+            font-size: 1.5em;
         }
 
         .section {
@@ -38,16 +38,16 @@
             justify-content: space-around;
             align-items: center;
             margin-bottom: 40px;
-            flex-wrap: nowrap; /* Prevent wrapping of images */
+            flex-wrap: nowrap;
         }
 
         .image-row div {
-            margin: 0 10px; /* General margin between the images */
+            margin: 0 10px;
         }
 
         .image-row img {
-            flex-grow: 1; /* Allow images to grow and fill space */
-            flex-shrink: 1; /* Allow images to shrink as needed */
+            flex-grow: 1;
+            flex-shrink: 1;
             width: auto;
             max-width: 100%;
             border: 2px solid black;
@@ -57,7 +57,7 @@
 
         .image-label {
             font-family: 'Times New Roman', Times, serif;
-            font-size: 18px;
+            font-size: 16px;
             margin-top: 5px;
             text-align: center;
         }
@@ -65,13 +65,13 @@
         .arrow-right {
             flex-grow: 0;
             font-size: 30px;
-            margin: 0 30px; /* Add space around the arrow */
+            margin: 0 30px;
         }
 
         .arrow-down {
             text-align: center;
             font-size: 30px;
-            margin: 10px 0 30px 0; /* Reduce the top margin */
+            margin: 10px 0 30px 0;
         }
 
         .variation-grid {
@@ -92,26 +92,26 @@
 
         .button-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 images per row */
-            gap: 20px; /* Space between images */
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
             justify-items: center;
             margin-bottom: 40px;
             width: 100%;
-            max-width: 100%; /* Maintain 1.5-inch margins on both sides */
-            box-sizing: border-box; /* Ensure padding is included in width calculation */
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
         .button-grid img {
-            width: 100%; /* Make images responsive */
-            height: auto; /* Maintain aspect ratio */
-            max-width: 100%; /* Prevent images from overflowing */
+            width: 100%;
+            height: auto;
+            max-width: 100%;
             border: 2px solid black;
             border-radius: 8px;
             object-fit: cover;
         }
 
         .toggle-button {
-            background-color: #607d8b; /* Blue-gray color */
+            background-color: #607d8b;
             color: white;
             padding: 5px 8px;
             border: 2px solid black;
@@ -119,28 +119,27 @@
             cursor: pointer;
             font-family: 'Times New Roman', Times, serif;
             font-size: 14px;
-            text-align: center; /* Center text inside the button */
-            max-width: 100%; /* Prevent button overflow */
-            white-space: normal; /* Allow text to wrap onto multiple lines */
-            word-wrap: break-word; /* Ensure long words can break and wrap */
+            text-align: center;
+            max-width: 100%;
+            white-space: normal;
+            word-wrap: break-word;
         }
 
-        /* Active button style */
         .active {
-            background-color: #455a64; /* Darker shade of blue-gray for active buttons */
+            background-color: #455a64;
         }
 
 
         .button-group {
             display: flex;
             justify-content: center;
-            flex-wrap: wrap; /* Allow buttons to wrap if they don't fit */
+            flex-wrap: wrap;
             gap: 5px;
             max-width: 100%;
         }
 
         .unbold {
-            font-weight: normal; /* Unbold this specific H2 */
+            font-weight: normal;
         }
 
 
@@ -212,7 +211,6 @@
         </p>
     </div>
 
-    <!-- Base, Naive Translate, Cropped Translate -->
     <div class="section">
         <div class="image-row">
             <div>
@@ -296,8 +294,6 @@
         </p>
     </div>
 
-
-    <!-- First Row of Images with Arrow -->
     <div class="section">
         <div class="image-row">
             <div>
@@ -329,7 +325,6 @@
         </p>
     </div>
 
-    <!-- Second Row of Images with Arrow -->
     <div class="section">
         <div class="image-row">
             <div>
@@ -437,10 +432,10 @@
 
     <div class="section">
         <h3>Results for Provided Images:</h3>
-         <p>Hover your mouse over the buttons below each image to display the edited image.</p>
+            <p>Hover your mouse over the buttons below each image to display the edited image.
+            The base images were removed due to their extreme similarity to the 0-1 contrast images.</p>
         <br>
         <div id="image-grid" class="button-grid">
-            <!-- Image Blocks Will Be Dynamically Inserted Here -->
         </div>
     </div>
 
@@ -449,7 +444,6 @@
     <div class="section">
         <h3>Results for Additional Images:</h3>
         <div id="special-image-grid" class="button-grid">
-            <!-- Special Image Blocks Will Be Dynamically Inserted Here -->
         </div>
     </div>
     <br>
@@ -482,15 +476,14 @@
 
         const imageVariations = ['0_1_contrast', 'histo_eq', 'adapt_histo_eq', 'gray_world', 'avg_world'];
 
-        const labels = ['0-1 Contrast (Base)', 'Histogram Equalization', 'Adaptive Histogram Equalization', 'Gray World Balance', 'Avg. World Balance'];
+        const labels = ['0-1 Contrast', 'Histogram Equalization', 'Adaptive Histogram Equalization', 'Gray World Balance', 'Avg. World Balance'];
 
         function createImageBlock(imageId, imageName, label) {
             const imageContainer = document.createElement('div');
 
-            // Create label for the image with the custom label string
             const labelElement = document.createElement('p');
             labelElement.className = 'image-label';
-            labelElement.textContent = `${imageName}: ${label}`; // Use the label string here
+            labelElement.textContent = `${imageName}: ${label}`;
 
 
             const imageElement = document.createElement('img');
@@ -505,11 +498,11 @@
                 const button = document.createElement('button');
                 button.className = 'toggle-button';
                 button.textContent = label;
-                button.setAttribute('onmouseover', `toggleImage(${imageId}, ${index + 1}, this)`); // Pass the button itself
+                button.setAttribute('onmouseover', `toggleImage(${imageId}, ${index + 1}, this)`);
                 buttonGroup.appendChild(button);
             });
 
-            imageContainer.appendChild(labelElement); // Add label above the image
+            imageContainer.appendChild(labelElement);
             imageContainer.appendChild(imageElement);
             imageContainer.appendChild(buttonGroup);
 
@@ -519,7 +512,7 @@
         function populateImageGrid() {
             const imageGrid = document.getElementById('image-grid');
             imageNames.forEach((image, index) => {
-                const imageBlock = createImageBlock(index + 1, image.name, image.label); // Pass name and label
+                const imageBlock = createImageBlock(index + 1, image.name, image.label);
                 imageGrid.appendChild(imageBlock);
             });
         }
@@ -527,12 +520,12 @@
         function populateSpecialImageGrid() {
             const specialImageGrid = document.getElementById('special-image-grid');
             specialImageNames.forEach((image, index) => {
-                const imageBlock = createImageBlock(imageNames.length + index + 1, image.name, image.label); // Pass name and label
+                const imageBlock = createImageBlock(imageNames.length + index + 1, image.name, image.label);
                 specialImageGrid.appendChild(imageBlock);
             });
         }
 
-        // Reset active buttons on all images
+
         function resetActiveButtons(imageId) {
             const buttonGroup = document.querySelector(`#image-${imageId}`).nextElementSibling;
             buttonGroup.querySelectorAll('.toggle-button').forEach(button => {
@@ -546,14 +539,13 @@
             if (imgElement) {
                 const imageName = allImageNames[imageId - 1].name;
                 imgElement.src = `media/out_${imageVariations[variation - 1]}/${imageName}.jpg`;
-                resetActiveButtons(imageId); // Reset previously active buttons
-                button.classList.add('active'); // Highlight the current active button
+                resetActiveButtons(imageId);
+                button.classList.add('active');
             } else {
                 console.log(`Image not found for ID: ${imageId}`);
             }
         }
 
-        // Populate the grids on page load
         window.onload = function () {
             populateImageGrid();
             populateSpecialImageGrid();
