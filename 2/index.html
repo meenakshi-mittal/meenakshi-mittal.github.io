@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Display</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            margin: 0;
+            background-color: #607d8b;
+        }
+
+        .wrapper {
+            background-color: #bfcbd1;
+            max-width: calc(100% - 2in);
+            margin: 0 auto;
+            padding-left: 0.5in;
+            padding-right: 0.5in;
+            box-sizing: border-box;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 1.5em;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .image-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: nowrap;
+        }
+
+        .image-row div {
+            margin: 0 10px;
+        }
+
+        .image-row img {
+            flex-grow: 1;
+            flex-shrink: 1;
+            width: auto;
+            height: 300px;
+            max-width: 100%;
+
+            object-fit: contain;
+        }
+
+        .scaled-image {
+            image-rendering: pixelated;
+        }
+
+        .image-label {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .arrow-right {
+            flex-grow: 0;
+            font-size: 30px;
+            margin: 0 30px;
+        }
+
+        .arrow-down {
+            text-align: center;
+            font-size: 30px;
+            margin: 10px 0 30px 0;
+        }
+
+        .variation-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            justify-items: center;
+        }
+
+        .variation-grid img {
+            width: 100%;
+        }
+
+        .variation-label {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .unbold {
+            font-weight: normal;
+        }
+
+        .auto-height-container img.auto-height-image {
+            width: auto;
+            height: 800px;
+            max-width: 100%;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="section">
+        <br>
+        <h1>CS 180: Project 2</h1>
+        <h2>Fun with Filters and Frequencies!</h2>
+        <h2 class="unbold">Meenakshi Mittal</h2>
+    </div>
+
+    <div class="section">
+        <h3>Overview:</h3>
+        <p>
+            In this project, we explore some methods of algorithmic image filtering.
+            We will try to detect edges using derivatives and gradients, simulate high-pass and low-pass filtering, and blend images together using Laplacian stacks.
+    </div>
+
+    <div class="section">
+        <h3>Part 1: Fun with Filters:</h3>
+        <h4>Part 1.1: Finite Difference Operator:</h4>
+        <p>
+            We can take the x and y partial derivatives of an image by convolving it with the finite difference operators.
+            The operators look like this:
+            <br>
+            <br>
+            <img src="media/cameraman/diff_op.png" alt="Finite Difference Operators" width="300">
+            <br>
+            <br>
+            Note that 0.5 is added to all images for the purpose of displaying them, since many of the convolutions return negative values.
+            Here, we take a look at the provided image of a cameraman and its convolutions with these operators:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/cameraman/cameraman.png" alt="Image 1">
+                <p class="image-label">Original</p>
+            </div>
+            <div>
+                <img src="media/cameraman/dx_cameraman.png" alt="Image 2">
+                <p class="image-label">Partial Derivative in x</p>
+            </div>
+            <div>
+                <img src="media/cameraman/dy_cameraman.png" alt="Image 3">
+                <p class="image-label">Partial Derivative in y</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            The partial derivative images appear noisy. We will address this in a bit.
+            <br>
+            <br>
+            We can also find the gradient magnitude of the image.
+            To do this, we simply take the square root of the sum of the squares of the partial derivative images.
+            <br>
+            <br>
+            Below, we have the raw gradient magnitude image of the cameraman, computed as described.
+            Alongside it is a binarized gradient magnitude image, using a threshold of 0.3.
+            Any pixel with a higher brightness than 0.3 was converted to 1 (white), and anything lower was converted to 0 (black).
+            This threshold was determined qualitatively, attempting to suppress as much noise as possible while still maintaining the image's edge details.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/cameraman/gradient_cameraman.png" alt="Image 1">
+                <p class="image-label">Raw Gradient Magnitude</p>
+            </div>
+            <div>
+                <img src="media/cameraman/gradient_bin_cameraman.png" alt="Image 2">
+                <p class="image-label">Binarized Gradient Magnitude</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Part 1.2: Derivative of Gaussian (DoG) Filter:</h4>
+        <p>
+            The partial derivatives we displayed above look quite noisy. How can we fix this?
+            <br>
+            <br>
+            One option is to convolve the image with a Gaussian filter before proceeding with our derivative convolution.
+            The intention is to remove some of the higher frequency features in the image that could potentially create noise after the convolution.
+            <br>
+            <br>
+            Below, we apply a Gaussian filter (with kernel size = 13 and sigma = 13/6) to the cameraman image, and then convolve it with the same partial derivative operators.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/cameraman/gaussian_filter.png" alt="Image 1">
+                <p class="image-label">Gaussian Filter</p>
+            </div>
+            <div>
+                <img src="media/cameraman/gaussian_cameraman.png" alt="Image 1">
+                <p class="image-label">Original with Gaussian Blur</p>
+            </div>
+            <div>
+                <img src="media/cameraman/DoG_x_2_conv_cameraman.png" alt="Image 2">
+                <p class="image-label">Partial Derivative in x</p>
+            </div>
+            <div>
+                <img src="media/cameraman/DoG_y_2_conv_cameraman.png" alt="Image 3">
+                <p class="image-label">Partial Derivative in y</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            This looks much better! The noise we saw in the edges of the original partial derivative images appears to be entirely gone.
+            The images almost look like they are embossed and appear to pop out of the page a bit.
+            Now it is very clear to see the "positive" and "negative" partial derivatives within the image.
+            Wherever it is dark, the image is transitioning from a brighter color to a darker color,
+            and where it is light, the image is transitioning from dark to bright (when looked at from left to right or up to down).
+        </p>
+        <p>
+            We will take this one step further by reducing the number of image convolutions from 2 to 1.
+            We can do this by first convolving the Gaussian filter with the finite difference operators (a small and efficient calculation),
+            and then our image with this new filter. The results of this are shown below:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/cameraman/gaussian_diff_x.png" alt="Image 1">
+                <p class="image-label">Gaussian Filter + Dx</p>
+            </div>
+            <div>
+                <img src="media/cameraman/gaussian_diff_y.png" alt="Image 1">
+                <p class="image-label">Gaussian Filter + Dy</p>
+            </div>
+            <div>
+                <img src="media/cameraman/cameraman.png" alt="Image 1">
+                <p class="image-label">Original</p>
+            </div>
+            <div>
+                <img src="media/cameraman/DoG_x_1_conv_cameraman.png" alt="Image 2">
+                <p class="image-label">Partial Derivative in x</p>
+            </div>
+            <div>
+                <img src="media/cameraman/DoG_y_1_conv_cameraman.png" alt="Image 3">
+                <p class="image-label">Partial Derivative in y</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            We get the same results as before, with a more efficient calculation. Yay!
+        </p>
+    </div>
+
+    <div class="section">
+        <h3>Part 2: Fun with Frequencies!:</h3>
+        <h4>Part 2.1: Image "Sharpening"</h4>
+        <p>
+            We can also use the Gaussian filter to sharpen images.
+            When we apply the Gaussian filter to an image, we retain the image's lower frequencies.
+            If we take a Gaussian filtered and subtract it from the original, we are left with the image's higher frequencies.
+            We can then simply take these higher frequencies and add some multiple of them back to our original image.
+            This achieves the effect of image sharpening that we often see in photo editing applications.
+        </p>
+        <p>
+            Instead of computing a series of convolutions and image operations, we can condense this process into a single convolution called the "unsharp mask filter".
+            If e is the identity filter, g is the Gaussian filter, and a is some multiplicative constant, the unsharp mask filter looks like this: ((1+a)e - ag).
+            Here are some examples:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+            <img src="media/data/taj.jpg" alt="Variation 2">
+                <p class="image-label">Original</p>
+            </div>
+            <div>
+            <img src="media/out/sharp_taj.jpg" alt="Variation 4">
+                <p class="image-label">Sharpened (Gaussian kernel size = 3, a = 5)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+            <img src="media/cs180_photos/glass.jpg" alt="Variation 2">
+                <p class="image-label">Original</p>
+            </div>
+            <div>
+            <img src="media/out/blur_glass.jpg" alt="Variation 4">
+                <p class="image-label">Gaussian Blurred</p>
+            </div>
+            <div>
+            <img src="media/out/sharp_glass.jpg" alt="Variation 4">
+                <p class="image-label">Re-sharpened</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+            <img src="media/cs180_photos/arches.jpg" alt="Variation 2">
+                <p class="image-label">Original</p>
+            </div>
+            <div>
+            <img src="media/out/blur_arches.jpg" alt="Variation 4">
+                <p class="image-label">Gaussian Blurred</p>
+            </div>
+            <div>
+            <img src="media/out/sharp_arches.jpg" alt="Variation 4">
+                <p class="image-label">Re-sharpened</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+            <img src="media/cs180_photos/vegetables.jpg" alt="Variation 2">
+                <p class="image-label">Original</p>
+            </div>
+            <div>
+            <img src="media/out/blur_vegetables.jpg" alt="Variation 4">
+                <p class="image-label">Gaussian Blurred</p>
+            </div>
+            <div>
+            <img src="media/out/sharp_vegetables.jpg" alt="Variation 4">
+                <p class="image-label">Re-sharpened</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Part 2.2: Hybrid Images:</h3>
+        <p>
+            Now let's have some fun. We will create hybrid images using an approach described in a SIGGRAPH 2006 paper by Oliva, Torralba, and Schyns.
+            The intention of these images is to appear differently when viewed up close versus from afar.
+            This is achieved by overlaying the high-frequency features of one image and the low-frequency features of another image.
+            To simulate the extraction of the low-frequency features, we are using our old friend the Gaussian filter.
+            To simulate the extraction of the high-frequency features, we are simply subtracting the low-frequency features from the original image.
+            The provided image alignment code was used to align and resize all of the following images.
+            <br>
+            <br>
+            Take a look at Derek morphed with his cat Nutmeg. Look at it up close, and you'll primarily see Nutmeg. Zoom out or squint, and you'll only see Derek:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/catman/aligned_cat.jpg" alt="Red Channel">
+                <p class="image-label">Aligned Nutmeg</p>
+            </div>
+            <div>
+                <img src="media/catman/aligned_man.jpg" alt="Green Channel">
+                <p class="image-label">Aligned Derek</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/catman/high_cat.jpg" alt="Blue Channel">
+                <p class="image-label">High Frequency Nutmeg</p>
+            </div>
+            <div>
+                <img src="media/catman/low_man.jpg" alt="Blue Channel">
+                <p class="image-label">Low Frequency Derek</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/catman/catman.jpg" alt="Failed Alignment">
+                <p class="image-label">Nutmeg-Derek</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            The optimal Gaussian kernel sizes was determined as 85 for both images.
+            <br>
+            <br>
+            Let's look at another one. From up close, we can only see the winner of the world's ugliest mascot award.
+            But zoom out a bit, and you'll start to notice a friendly old face:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/osktree/aligned_tree.jpg" alt="Red Channel">
+                <p class="image-label">Aligned Tree</p>
+            </div>
+            <div>
+                <img src="media/osktree/aligned_oski.jpg" alt="Green Channel">
+                <p class="image-label">Aligned Oski</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/osktree/high_tree.jpg" alt="Blue Channel">
+                <p class="image-label">High Frequency Tree</p>
+            </div>
+            <div>
+                <img src="media/osktree/low_oski.jpg" alt="Blue Channel">
+                <p class="image-label">Low Frequency Oski</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/osktree/osktree.jpg" alt="Failed Alignment">
+                <p class="image-label">Osktree</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            This one unfortunately doesn't look the best in my opinion.
+            I think Oski's face and the tree are just too different from each other, in terms of shape and color (and quality of the schools they represent...).
+            The best kernel sizes were determined to be 45 for the tree and 35 for Oski.
+        <br>
+        <br>
+            Moving on. In case anyone wasn't aware, tensions are pretty high in American politics at the moment.
+            The presidential election is less than 2 months away!
+            While the 2 candidates have very different views from one another, perhaps we can help them reach a middle ground...
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/harrump/aligned_trump.jpg" alt="Red Channel">
+                <p class="image-label">Aligned Trump</p>
+            </div>
+            <div>
+                <img src="media/harrump/aligned_kamala.jpg" alt="Green Channel">
+                <p class="image-label">Aligned Harris</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/harrump/high_trump.jpg" alt="Blue Channel">
+                <p class="image-label">High Frequency Trump</p>
+            </div>
+            <div>
+                <img src="media/harrump/low_kamala.jpg" alt="Blue Channel">
+                <p class="image-label">Low Frequency Harris</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/harrump/Harrump.jpg" alt="Failed Alignment">
+                <p class="image-label">Harrump</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            This one looks pretty good! The optimal Gaussian kernel sizes were determined to be 65 for Donald Trump and 55 for Kamala Harris.
+            <br>
+            <br>
+            Let's conduct a frequency analysis for this one. We first convert the images to grayscale, and then we find the log magnitude of the Fourier transform of all of the above images.
+            We do this by applying the provided line of python code to each one: plt.imshow(np.log(np.abs(np.fft.fftshift(np.fft.fft2(gray_image))))). Here's how they look:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/harrump frequencies/aligned_trump.jpg" alt="Red Channel">
+                <p class="image-label">Aligned Trump</p>
+            </div>
+            <div>
+                <img src="media/harrump frequencies/aligned_kamala.jpg" alt="Green Channel">
+                <p class="image-label">Aligned Harris</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/harrump frequencies/high_trump.jpg" alt="Blue Channel">
+                <p class="image-label">High Frequency Trump</p>
+            </div>
+            <div>
+                <img src="media/harrump frequencies/low_kamala.jpg" alt="Blue Channel">
+                <p class="image-label">Low Frequency Harris</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/harrump frequencies/Harrump.jpg" alt="Failed Alignment">
+                <p class="image-label">Harrump</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Let's take a closer look at these.
+            In Trump's frequency plots, the most noticeable difference is a bright spot at the very center in the original image's plot, and a lack thereof in the high-frequency version.
+            This makes sense, as low frequencies are typically present in the center of the plot and we tried to removed them.
+            In Harris' frequency plots, we observe that the four quadrants are noticeably dimmer in the low-frequency plot.
+            This again makes sense, due to the removal of higher frequencies that tend to appear farther from the center.
+            There is also an intriguing artifact in the Harris low-frequency plot-- a faint 3x3 grid is visible in each of the four quadrants.
+            I do not have a good explanation as to why these appeared.
+        </p>
+    </div>
+
+    <div class="section">
+        <h3>Multi-resolution Blending and the Oraple journey</h3>
+        <p>
+            Now we will attempt to seamlessly blend images together according to some mask.
+            We will follow a multi resolution blending approach as described in the 1983 paper by Burt and Adelson.
+            We will create a so-called "image spline", by gently distorting two images at different bands of frequencies around their seam.
+            <br>
+            <br>
+            Out first step is to create and visualize Gaussian and Laplacian stacks for each image as shown below.
+            The Gaussian filter is simply applied to our images repeatedly with the same kernel size (11 in our case) to create the Gaussian stack.
+            The i-th layer of the Laplacian stack is created by computing gaussian_stack[i] - gaussian_stack[i-1].
+            Here we created stacks of 300 images each. A half black half white mask is used to mask both images.
+            At the end, we can simply sum up the layers of our combined Laplacian stack to get our final blended image.
+            Here is the Oraple:
+        </p>
+    </div>
+
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/oraple/apple.jpeg" alt="Red Channel">
+                <p class="image-label">Apple</p>
+            </div>
+            <div>
+                <img src="media/oraple/orange.jpeg" alt="Green Channel">
+                <p class="image-label">Orange</p>
+            </div>
+            <div>
+                <img src="media/oraple/just_mask.jpg" alt="Green Channel">
+                <p class="image-label">Mask</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row auto-height-container">
+            <div>
+                <img src="media/oraple/g_stacks.png" alt="Red Channel" class="auto-height-image">
+                <p class="image-label">Gaussian Stacks</p>
+            </div>
+            <div>
+                <img src="media/oraple/all_3.png" alt="Red Channel" class="auto-height-image">
+                <p class="image-label">Laplacian Stacks</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/oraple/oraple.jpg" alt="Red Channel">
+                <p class="image-label">Oraple</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Lovely. Now we also attempt to seamlessly blend an image of the Earth and our Moon, courtesy of Google.
+            I used the same image alignment code from earlier to align the 2 images.
+            Again, we use the same mask, same Gaussian kernel size of 11, and create stacks of 300 images:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/moorth/aligned_earth.jpg" alt="Red Channel">
+                <p class="image-label">Earth</p>
+            </div>
+            <div>
+                <img src="media/moorth/aligned_moon.jpg" alt="Green Channel">
+                <p class="image-label">Moon</p>
+            </div>
+            <div>
+                <img src="media/oraple/just_mask.jpg" alt="Green Channel">
+                <p class="image-label">Mask</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row auto-height-container">
+            <div>
+                <img src="media/moorth/g_stacks.png" alt="Red Channel" class="auto-height-image">
+                <p class="image-label">Gaussian Stacks</p>
+            </div>
+            <div>
+                <img src="media/moorth/all_3.png" alt="Red Channel" class="auto-height-image">
+                <p class="image-label">Laplacian Stacks</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/moorth/moorth.jpg" alt="Red Channel">
+                <p class="image-label">Moorth</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Finally, we attempt to use an irregular mask.
+            Here, I am blending an image of myself with an image of my friend Wiktor.
+            I aligned our headshots and then created a custom mask that combines his eyes and hair with my face.
+            Again, using a Gaussian kernel of size 11, and this time the stacks have 50 images.
+            Here are the results:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/wikshi/aligned_wiktor.jpg" alt="Red Channel">
+                <p class="image-label">Wiktor</p>
+            </div>
+            <div>
+                <img src="media/wikshi/aligned_me.jpg" alt="Green Channel">
+                <p class="image-label">Meenakshi</p>
+            </div>
+            <div>
+                <img src="media/wikshi/wikshi_mask.png" alt="Green Channel">
+                <p class="image-label">Mask</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row auto-height-container">
+            <div>
+                <img src="media/wikshi/g_stacks.png" alt="Red Channel" class="auto-height-image">
+                <p class="image-label">Gaussian Stacks</p>
+            </div>
+            <div>
+                <img src="media/wikshi/all_3.png" alt="Red Channel" class="auto-height-image">
+                <p class="image-label">Laplacian Stacks</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/wikshi/wikshi.jpg" alt="Red Channel">
+                <p class="image-label">Wikshi</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Woah. That worked better than I thought it would.
+            <br>
+            <br>
+            Anyways, that's the end of the project!
+            I had a lot of fun with this one, and I appreciate the amount of creativity we were allowed to express.
+            I think the most important thing I learned from this project was to always look for runtime optimizations.
+            At some point, I found myself trying to use larger and larger Gaussian filters that were taking forever to run.
+            I realized there was a much better solution to this, which was literally just applying a smaller sized Gaussian filter a larger number of times.
+            This fixed most of the issues I was having. I also learned to appreciate the mighty power of the Gaussian filter.
+            I had no idea Gaussian curves were used so extensively in computational photography, so that really surprised me.
+        </p>
+        <br>
+        <br>
+        <br>
+    </div>
+
+</body>
+</html>
