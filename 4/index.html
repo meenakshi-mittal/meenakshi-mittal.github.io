@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Display</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            margin: 0;
+            background-color: #607d8b;
+        }
+
+        .wrapper {
+            background-color: #bfcbd1;
+            max-width: calc(100% - 2in);
+            margin: 0 auto;
+            padding-left: 0.5in;
+            padding-right: 0.5in;
+            box-sizing: border-box;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 1.5em;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .image-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 20px; /* Reduce the gap between image rows */
+            flex-wrap: nowrap;
+        }
+
+        .image-row div {
+            margin: 0 10px;
+        }
+
+        .image-row img {
+            flex-grow: 1;
+            flex-shrink: 1;
+            width: auto;
+            height: 350px;
+            max-width: 100%;
+
+            object-fit: contain;
+        }
+
+        .scaled-image {
+            image-rendering: pixelated;
+        }
+
+        .image-label {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .arrow-right {
+            flex-grow: 0;
+            font-size: 30px;
+            margin: 0 30px;
+        }
+
+        .arrow-down {
+            text-align: center;
+            font-size: 30px;
+            margin: 10px 0 30px 0;
+        }
+
+        .variation-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            justify-items: center;
+        }
+
+        .variation-grid img {
+            width: 100%;
+        }
+
+        .variation-label {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .unbold {
+            font-weight: normal;
+        }
+
+        .auto-height-container img.auto-height-image {
+            width: auto;
+            height: 800px;
+            max-width: 100%;
+        }
+
+        .spacer {
+            width: 50px; /* Define the width of the space */
+            height: auto; /* Make sure it doesn't affect height */
+            display: inline-block; /* Acts like an invisible block between elements */
+        }
+
+        .small-image-row {
+            display: flex;
+            justify-content: center; /* Center the images and arrow horizontally */
+            align-items: center;     /* Vertically center the images and arrow */
+            gap: 15px;               /* Add space between images and arrow */
+        }
+
+        .small-image-row img {
+            height: 200px; /* Set smaller height for the images */
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+
+    </style>
+</head>
+<body>
+
+
+<div class="wrapper">
+    <div class="section">
+        <br>
+        <h1>CS 180: Project 3</h1>
+        <h2>Face Morphing</h2>
+        <h2 class="unbold">Meenakshi Mittal</h2>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/links/links.jpg" alt="Image 1">
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/links/avg_link_hat.jpg" alt="Image 1">
+            </div>
+        </div>
+    </div>
+
+
+    <div class="section">
+        <h3>Overview:</h3>
+        <p>
+            In this project, we walk through the process of producing morphs between faces.
+            We use these ideas to compute the mean of a population of faces,
+            extrapolate from a population mean to create caricatures of myself,
+            and have some additional fun with face morphs and a beloved video game character.
+        </p>
+    </div>
+
+    <div class="section">
+        <h3>Part 1: Defining Correspondences:</h3>
+        <p>
+            To start off, we will attempt to morph images of my friend Wiktor and me.
+            The images were naively aligned and resized to match each other using the provided script from Project 2.
+        </p>
+        <p>
+            Our first step is to label correspondence points on the images of the faces we want to morph together.
+            I wrote a script that allowed me to see exactly which points I labelled on each face, so I could match up the labels on the other face.
+            I labelled 49 points on each image, including 8 points along the borders to ensure full image morphing.
+            Here are the labelled images:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/wikshi/aligned_me.jpg" alt="Image 1">
+                <p class="image-label">Me</p>
+            </div>
+            <div>
+                <img src="media/wikshi/me+labels.jpg" alt="Image 1">
+                <p class="image-label">Me With Correspondences</p>
+            </div>
+            <div>
+                <img src="media/wikshi/aligned_wiktor.jpg" alt="Image 2">
+                <p class="image-label">Wiktor</p>
+            </div>
+            <div>
+                <img src="media/wikshi/wik+labels.jpg" alt="Image 2">
+                <p class="image-label">Wiktor With Correspondences</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Part 2: Computing the "Midway" Face:</h3>
+        <p>
+            Now we will compute the midway face between these two images. Here is the process we follow:
+            <br>
+            <br>
+            1) Take the point-wise averages of all the correspondence pairs.
+            <br>
+            2) Compute the Delaunay triangulation of these midway points.
+            <br>
+            3) Use this triangulation to map each triangle of pixels from the original images onto their corresponding "midway" triangle, using an affine transformation.
+            (In reality, we are mapping the triangles from the midway image onto the originals, interpolating from the surrounding points, and then mapping that back to the midway image)
+            <br>
+            4) Take the average of the 2 morphed images to get the midway colors.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/wikshi/aligned_me.jpg" alt="Image 1">
+                <p class="image-label">Me</p>
+            </div>
+            <div>
+                <img src="media/wikshi/me_delaunay.jpg" alt="Image 1">
+                <p class="image-label">Delaunay Triangulation</p>
+            </div>
+            <div>
+                <img src="media/wikshi/me_morph_delaunay.jpg" alt="Image 2">
+                <p class="image-label">Affine Transformation</p>
+            </div>
+            <div>
+                <img src="media/wikshi/me_morph.jpg" alt="Image 1">
+                <p class="image-label">Final Morphed Shape</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/wikshi/aligned_wiktor.jpg" alt="Image 1">
+                <p class="image-label">Wiktor</p>
+            </div>
+            <div>
+                <img src="media/wikshi/wik_delaunay.jpg" alt="Image 1">
+                <p class="image-label">Delaunay Triangulation</p>
+            </div>
+            <div>
+                <img src="media/wikshi/wik_morph_delaunay.jpg" alt="Image 2">
+                <p class="image-label">Affine Transformation</p>
+            </div>
+            <div>
+                <img src="media/wikshi/wik_morph.jpg" alt="Image 1">
+                <p class="image-label">Final Morphed Shape</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/wikshi/aligned_me.jpg" alt="Image 1">
+                <p class="image-label">Me</p>
+            </div>
+            <div>
+                <img src="media/wikshi/midway.jpg" alt="Image 1">
+                <p class="image-label">Wikshi</p>
+            </div>
+            <div>
+                <img src="media/wikshi/aligned_wiktor.jpg" alt="Image 2">
+                <p class="image-label">Wiktor</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Part 3. The Morph Sequence:</h3>
+        <p>
+            Using a similar process to the one described above, we can create a 45 frame animation that morphs from one face to the other.
+            The only difference is that instead of taking the average shape and color, we will take 45 weighted averages of shape and color.
+            For 0 < alpha < 1, this just looks like: alpha * im1 + (1-alpha) * im2. This applies for both the correspondences point and color calculations.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/wikshi/animation.gif" alt="Image 1">
+                <p class="image-label">Morph Sequence</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Just for fun, I repeated this process to morph a different photo of me to Christian Bale's iconic character Patrick Bateman in American Psycho.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/me_bale/aligned_me.jpg" alt="Image 1">
+                <p class="image-label">Me</p>
+            </div>
+            <div>
+                <img src="media/me_bale/midway.jpg" alt="Image 1">
+                <p class="image-label">...???</p>
+            </div>
+            <div>
+                <img src="media/me_bale/aligned_bale.jpg" alt="Image 2">
+                <p class="image-label">Patrick Bateman</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/me_bale/animation.gif" alt="Image 1">
+                <p class="image-label">Morph Sequence</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Part 4. The "Mean Face" of a Population:</h3>
+        <p>
+            We can also use this technique to compute the average face of a population.
+            I acquired a set of 200 neutral and smiling grayscale portrait images from https://fei.edu.br/~cet/facedatabase.html.
+            Each image also came with a set of 46 correspondence labels each, to which I added the 4 corner points to capture the full images.
+            I computed the average correspondences, morphed each image to the average, and then took the average of all the morphed images.
+        </p>
+        <p>
+            Here are a few examples of the original images and their morphs:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/mean_face/examples/im1.jpg" alt="Image 1">
+                <p class="image-label">Example 1</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/mean_face/examples/im1_warped.jpg" alt="Image 1">
+                <p class="image-label">Example 1 Morphed</p>
+            </div>
+            <div class="spacer"></div>
+            <div>
+                <img src="media/mean_face/examples/im2.jpg" alt="Image 1">
+                <p class="image-label">Example 2</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/mean_face/examples/im2_warped.jpg" alt="Image 1">
+                <p class="image-label">Example 2 Morphed</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/mean_face/examples/im3.jpg" alt="Image 1">
+                <p class="image-label">Example 3</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/mean_face/examples/im3_warped.jpg" alt="Image 1">
+                <p class="image-label">Example 3 Morphed</p>
+            </div>
+            <div class="spacer"></div>
+            <div>
+                <img src="media/mean_face/examples/im4.jpg" alt="Image 1">
+                <p class="image-label">Example 4</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/mean_face/examples/im4_warped.jpg" alt="Image 1">
+                <p class="image-label">Example 4 Morphed</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+           Here are the averaged faces for the two populations:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/mean_face/not_smiling.jpg" alt="Image 1">
+                <p class="image-label">Average Neutral Face</p>
+            </div>
+            <div>
+                <img src="media/mean_face/smiling.jpg" alt="Image 1">
+                <p class="image-label">Average Smiling Face</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Now I will morph my own face to the average geometry of the neutral faces, and I will morph the average face to my own geometry.
+            I will use a different image of myself from before, to better match the type of headshots used in this dataset.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/mean_face/me4.jpg" alt="Image 1">
+                <p class="image-label">Me</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/mean_face/me4_morphed_to_avg.jpg" alt="Image 1">
+                <p class="image-label">Me Morphed to Average</p>
+            </div>
+            <div class="spacer"></div>
+            <div>
+                <img src="media/mean_face/not_smiling.jpg" alt="Image 1">
+                <p class="image-label">Average</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/mean_face/avg_morphed_to_me4.jpg" alt="Image 1">
+                <p class="image-label">Average Morphed to Me</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Part 5. Caricatures: Extrapolating from the Mean:</h3>
+        <p>
+            Using the average face we found above, I can create caricatures of myself.
+            I use the following formulas to compute this:
+            <br>
+            <br>
+            avg_to_me_vector = me - avg
+            <br>
+            me_caricature = me + alpha * avg_to_me_vector
+            <br>
+            <br>
+            This can be thought of as "adding alpha more of me to me".
+            <br>
+            <br>
+            This is similar to the process from earlier, but now we are using alpha outside the typical [0,1] range.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/caricatures/me4.jpg" alt="Image 1">
+                <p class="image-label">Me</p>
+            </div>
+            <div>
+                <img src="media/caricatures/0.5_more_me.jpg" alt="Image 1">
+                <p class="image-label">50% More Me</p>
+            </div>
+            <div>
+                <img src="media/caricatures/1.0_more_me.jpg" alt="Image 1">
+                <p class="image-label">100% More Me</p>
+            </div>
+            <div>
+                <img src="media/caricatures/1.5_more_me.jpg" alt="Image 1">
+                <p class="image-label">150% More Me</p>
+            </div>
+            <div>
+                <img src="media/caricatures/-1.5_more_me.jpg" alt="Image 1">
+                <p class="image-label">150% Less Me</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            These definitely look... odd. I guess what this tells me is that I have a pointier-than-average chin, a smaller-than-average space between my nose and mouth,
+            and a wider-than-average nose. Interesting.
+        </p>
+    </div>
+
+    <div class="section">
+        <h3>Bells and Whistles:</h3>
+        <p>
+            We will try a few more face morphing ideas. First, let's see how I would look as a man.
+            <br>
+            <br>
+            Since I am ethnically Indian, I found an image of the average Indian man.
+            Here is the resized image side-by-side with the image of myself that I will use.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/caricatures/me4.jpg" alt="Image 1">
+                <p class="image-label">Me</p>
+            </div>
+            <div>
+                <img src="media/caricatures/indian.png" alt="Image 1">
+                <p class="image-label">Average Indian Man</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Now I can use the same morphing techniques from before to achieve a few morph variations.
+            I labelled correspondences on the image of the average Indian man to match the existing ones on the image of me.
+            Below, I have done an average morph of the shape, color, and both.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/caricatures/shape_color_both/none.jpg" alt="Image 1">
+                <p class="image-label">Me</p>
+            </div>
+            <div>
+                <img src="media/caricatures/shape_color_both/shape.jpg" alt="Image 1">
+                <p class="image-label">50% Shape Morph</p>
+            </div>
+            <div>
+                <img src="media/caricatures/shape_color_both/color.jpg" alt="Image 1">
+                <p class="image-label">50% Color Morph</p>
+            </div>
+            <div>
+                <img src="media/caricatures/shape_color_both/both.jpg" alt="Image 1">
+                <p class="image-label">50% Shape and Color Morph</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            For fun, I also tried to make a caricature using these images.
+            I used the same approach from before, and I got what is supposedly the more feminine, less Indian version of me:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/caricatures/me4.jpg" alt="Image 1">
+                <p class="image-label">Me</p>
+            </div>
+            <div>
+                <img src="media/caricatures/shape_color_both/opposite.jpg" alt="Image 1">
+                <p class="image-label">Me, but 50% less Indian Man</p>
+            </div>
+            <div>
+                <img src="media/caricatures/indian.png" alt="Image 1">
+                <p class="image-label">Average Indian Man</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Moving on to our last experiment.
+            The main character of the popular video game franchise "The Legend of Zelda", Link, has had many different iterations over the years.
+            We will attempt to find the average Link.
+            I found an image that compiled 30 different versions of the character, and subdivided it to get the 30 images I would use.
+            I excluded a couple that had harsh angles / side profiles that I thought would be hard to label.
+            I labelled 58 correspondences on each image and morphed them together. The results are displayed below:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/links/links.jpg" alt="Image 1">
+                <p class="image-label">Iterations of Link</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/links/avg_link_hat.jpg" alt="Image 1">
+                <p class="image-label">A Link Between Links</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            That worked way better than I expected it to--
+            I thought the different angles and styles of the images might make the result contain more artifacts or be asymmetric.
+            I suppose the large number of images and correspondence points helped iron these issues out.
+            I think it's cool that the face was extracted very clearly, and other iconic features like his hair and hat are also somewhat visible.
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+        </p>
+    </div>
+
+
+</body>
+</html>
