@@ -7,6 +7,10 @@ from matplotlib import pyplot as plt
 
 from main import *
 
+def normalize(img):
+    img = img - np.min(img)
+    return img / np.max(img)
+
 def convolve(image, filter):
     ch1 = scipy.signal.convolve2d(image[:, :, 0], filter, mode='same', boundary='symm')
     ch2 = scipy.signal.convolve2d(image[:, :, 1], filter, mode='same', boundary='symm')
@@ -60,6 +64,7 @@ def mask_stack(im_stack, mask_stack):
 def oraple_stack(im1, im2, ksize, num_levels, out_path=None, mask=None):
     im1_g_stack = gaussian_stack(im1, num_levels, ksize)
     im1_l_stack = laplacian_stack(im1_g_stack)
+
     im2_g_stack = gaussian_stack(im2, num_levels, ksize)
     im2_l_stack = laplacian_stack(im2_g_stack)
 

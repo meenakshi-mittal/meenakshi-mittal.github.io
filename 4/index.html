@@ -129,6 +129,17 @@
 </head>
 <body>
 
+<html>
+<head>
+    <style>
+        img {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+    </style>
+</head>
+</html>
+
 
 <div class="wrapper">
     <div class="section">
@@ -319,7 +330,7 @@
 
     <div class="section">
         <p>
-            Looks like it works pretty well! So now we can move on to stitching our mosaics together.
+            Looks like it works pretty well! We can move on to stitching our mosaics together.
         </p>
     </div>
 
@@ -348,7 +359,7 @@
 
     <div class="section">
         <p>
-            Now, if we were to just place the images directly on top of one another, we would likely see some distinct lines separating the 2 images.
+            If we were to just place the images directly on top of one another, we would likely see some distinct lines separating the 2 images.
             Here is an example of the Seattle panorama stitched together this way, without any blending:
         </p>
     </div>
@@ -412,9 +423,10 @@
 
     <div class="section">
         <p>
-            Here are the full stitched and blended panoramas for all 3 sets of images.
+            Now we have everything we need to seamlessly blend our images into mosaics.
             I created the mosaics by adding one image to the mosaic at a time.
             For the glass museum images I started in the middle and worked outwards, while for the Seattle images I started at the edges and worked inwards.
+            Here are the full stitched and blended panoramas for all 3 sets of images.
         </p>
     </div>
 
@@ -443,6 +455,279 @@
                 <p class="image-label">Seattle</p>
             </div>
         </div>
+    </div>
+
+    <div class="section">
+        <h3>Project 4b:</h3>
+        <p>
+            Now, we will try to stitch the images automatically.
+            This section closely follows the procedure used in “Multi-Image Matching using Multi-Scale Oriented Patches” by Brown et al.
+            We will first detect Harris corners in the images we want to match,
+            then use Adaptive Non-Maximal Suppression to get an even distribution of 500 points with high corner strength,
+            then extract feature descriptors for each point and
+            find the best matches between the feature descriptors for both images,
+            and finally use 4-point RANSAC to compute the best homography between the images.
+            Once we have the best homography, we can simply use the code from part 4a to stitch and blend the images together.
+            <br>
+            <br>
+            For the majority of this section, I will use the following 2 images from the glass museum photo set to demonstrate each step:
+        </p>
+    </div>
+
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/glass/images/glass1.jpg" alt="Image 1">
+                <p class="image-label">Image 1</p>
+            </div>
+            <div>
+                <img src="media/glass/images/glass2.jpg" alt="Image 1">
+                <p class="image-label">Image 2</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Part 1: Harris Interest Point Detector</h4>
+        <p>
+            For this part, I simply used the provided code to find the Harris corners for each image, along with their corner strengths.
+            Most of my images outputted a very high number of Harris corners. Here are the Harris corners overlaid on the glass museum images:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/harris/glass1_all.jpg" alt="Image 1">
+                <p class="image-label">Image 1 Harris Corners</p>
+            </div>
+            <div>
+                <img src="media/harris/glass2_all.jpg" alt="Image 1">
+                <p class="image-label">Image 2 Harris Corners</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Part 2: Adaptive Non-Maximal Suppression</h4>
+        <p>
+            Clearly, this is way too many points to reasonably deal with.
+            We want to somehow limit the number of candidate points.
+            A first (misguided) approach would be to just increase the threshold for the corner strength, only keeping points with corner strength higher than the threshold.
+            Here is what we get from this approach:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/harris/glass1_high_h.jpg" alt="Image 1">
+                <p class="image-label">Image 1 Strongest Corners</p>
+            </div>
+            <div>
+                <img src="media/harris/glass2_high_h.jpg" alt="Image 1">
+                <p class="image-label">Image 2 Strongest Corners</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            This is still not very ideal. All the points are just clustered together now, which will likely cause us some issues down the road when we attempt to compute the homographies.
+            From part A, we saw that we got the best results when we selected correspondence points that were spread throughout the overlapping region.
+            To emulate this, we implement a technique from the paper known as Adaptive Non-Maximal Suppression.
+            For each point, we compute the surrounding radius within which no other point has a higher corner strength.
+            We keep some strength threshold for the scenario where a weaker point is to be placed within a stronger point's radius.
+            Then we simply keep the 500 points with the largest radii. Here is what the ANMS strategy gives us:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/harris/glass1_anms.jpg" alt="Image 1">
+                <p class="image-label">Image 1 ANMS</p>
+            </div>
+            <div>
+                <img src="media/harris/glass2_anms.jpg" alt="Image 1">
+                <p class="image-label">Image 2 ANMS</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Works pretty well! Now we move on to matching the points between the two images.
+        </p>
+    </div>
+
+    <div class="section">
+        <h4>Part 3: Extracting Feature Descriptors</h4>
+        <p>
+            For each of our remaining points, we want to extract feature descriptors that will allow us to compare and match points between the two images.
+            We do this by extracting 40x40 pixel regions around each feature point, downsizing it to 8x8 pixels (with anti-aliasing),
+            and then standardizing the resulting image (subtracting the mean and dividing by the standard deviation). Here is what that looks like:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/glass/features/glass1_feat_box.jpg" alt="Image 1">
+                <p class="image-label">Image 1 Feature Box</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/glass/features/glass1_feat.jpg" alt="Image 1">
+                <p class="image-label">Image 1 Feature Zoomed In</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/glass/features/glass1_feat_norm.jpg" alt="Image 1">
+                <p class="image-label">Image 1 Feature Scaled and Standardized</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/glass/features/glass2_feat_box.jpg" alt="Image 1">
+                <p class="image-label">Image 2 Feature Box</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/glass/features/glass2_feat.jpg" alt="Image 1">
+                <p class="image-label">Image 2 Feature Zoomed In</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/glass/features/glass2_feat_norm.jpg" alt="Image 1">
+                <p class="image-label">Image 2 Feature Scaled and Standardized</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Part 4: Matching Feature Descriptors Between Two Images</h4>
+        <p>
+            Note that the feature selected for the above visualization is the same for both images. How did I find this feature?
+            Our next step is to compute the squared distances between every feature descriptor for image 1 and every
+            feature descriptor for image 2. In order to determine which points to keep and which to throw away, we have to be a bit careful.
+            We could naively compute the nearest neighbor of each feature and keep all matches that are below some error threshold.
+            However, this will result in a large number of incorrect matches, as seen in the paper.
+            We instead use Lowe's trick, where we keep track of the top 2 nearest neighbors for each feature, and then compute the ratio 1-NN error / 2-NN error.
+            Now, if we keep all matches for which this ratio is below some threshold (I chose 0.3, using the graph given in the paper),
+            we find that most of the matches are correct. This is due to the fact that the feature points in one image may match very well to multiple different feature points in the other image.
+            Going just off of the 1st nearest neighbor may give back one of the incorrect matches. On the other hand, the ratio 1-NN error / 2-NN error
+            will only be low if the 1st best match is good and the 2nd best match is poor and has high error.
+            Thus, this method keeps only the "unique" matches between the images, which prevents storing similar-looking but incorrect matches.
+            <br>
+            <br>
+            Here are the matching points computed between the two images. We can see that the selected points line up quite well:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/harris/glass1_match.jpg" alt="Image 1">
+                <p class="image-label">Image 1 Matches</p>
+            </div>
+            <div>
+                <img src="media/harris/glass2_match.jpg" alt="Image 1">
+                <p class="image-label">Image 2 Matches</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Part 5: RANSAC to Compute Homography</h4>
+        <p>
+            We can now move on to finding the optimal homography matrix to mosaic the images together.
+            While our feature matching method appears to work quite well, there is still a lot of room for error.
+            We use a Random Sample Consensus (RANSAC) approach to mitigate the potential error.
+            The approach is quite straightforward: we randomly sample 4 of our matches, compute the homography matrix
+            that transforms one set of the points to the other (reused from part A), and then count the number "inliers" for that homography.
+            Inliers are point matches that agree with our homography-- in other words, a point match is an inlier if the distance between
+            the transformed point from image 1 (H*p) and its corresponding point in image 2 (p') is "small" (I chose a threshold of 4 pixels).
+            We repeat this sampling process many times (I chose 10000), and keep the homography that has the most inliers.
+            Then we simply use our stitching process from part A to mosaic the images together.
+            Here are the 2 images finally stitched together:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/glass/ransac/2_glass12.jpg" alt="Image 1">
+                <p class="image-label">Mosaiced Imaged</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Part 6: Making Mosaics</h4>
+        <p>
+            We will recreate the mosaics from part A, this time using the automatic stitching technique.
+            We use the same blending techniques from part A, using the same mask and the same Laplacian pyramid approach.
+            Here are the results side by side:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/cliff/images/cliff123.jpg" alt="Image 1">
+                <p class="image-label">Manually Stitched Pacifica</p>
+            </div>
+            <div>
+                <img src="media/cliff/ransac/cliff123.jpg" alt="Image 1">
+                <p class="image-label">Automatically Stitched Pacifica</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/glass/images/glass12345.jpg" alt="Image 1">
+                <p class="image-label">Manually Stitched Glass Museum</p>
+            </div>
+            <div>
+                <img src="media/glass/ransac/2_glass12345.jpg" alt="Image 1">
+                <p class="image-label">Automatically Stitched Glass Museum</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/seattle/images2/stl456123.jpg" alt="Image 1">
+                <p class="image-label">Manually Stitched Seattle</p>
+            </div>
+            <div>
+                <img src="media/seattle/ransac/stl123456.jpg" alt="Image 1">
+                <p class="image-label">Automatically Stitched Seattle</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>The End!</h4>
+        <p>
+            We have finally reached the end of our mosaic stitching journey.
+            I am quite pleased with the results-- I prefer the automatically stitched mosaic over the manual one in some cases, particularly in the Seattle mosaic.
+            Also, in the Pacifica mosaic, there is a pretty noticeable misalignment in the manually stitched version in the mountain in the far distance.
+            The automatically stitched version does not contain this artifact.
+            I think this whole project was very cool and very fun to implement.
+            I mostly appreciate the use of clever algorithms and tricks in the paper we replicated, as we get impressive looking results without
+            an excessive amount of compute or complexity. I like that a lot of the ideas we used, like ANMS, feature matching, Lowe's trick, and RANSAC,
+            are not necessarily the most straightforward, but each one is very intuitive and makes sense in the process. I also like that the project
+            was based around replicating a research paper on our own, which is arguably a valuable skill for any path one may choose to go down.
+        </p>
     </div>
 
     <div class="section">

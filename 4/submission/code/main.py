@@ -1,6 +1,6 @@
 import csv
 from laplacian_blending import *
-
+from harris import *
 
 def read_label_csv(in_path):
     with open(in_path, 'r') as file:
@@ -18,7 +18,10 @@ def computeH(p1, p2):
         p_prime.append(x2)
         p_prime.append(y2)
 
-    H_vars, _, _, _ = np.linalg.lstsq(np.array(eqs), np.array(p_prime), rcond=None)
+    if len(p1) == 4:
+        H_vars = np.linalg.solve(np.array(eqs), np.array(p_prime))
+    else:
+        H_vars, _, _, _ = np.linalg.lstsq(np.array(eqs), np.array(p_prime), rcond=None)
 
     H = [
         [H_vars[0], H_vars[1], H_vars[2]],
@@ -55,6 +58,7 @@ def warpImage(im, H, outpath=None):
     X = np.stack([col_box + min_col, row_box + min_row, np.ones(col_box.shape)])
 
     col, row, w = np.dot(H_inv, X)
+    w += 1e-16
     col /= w
     row /= w
 
@@ -66,11 +70,15 @@ def warpImage(im, H, outpath=None):
     valid_col_box = col_box[mask_p]
     box[valid_row_box, valid_col_box] = im[row[mask_p], col[mask_p]]
 
+    display_save_image(box[:,:,:3], outpath)
     return box, [min_row, min_col, max_row, max_col]
 
 
-def mosaic(im1, im2, im1_pts, im2_pts, outpath=None):
-    H = computeH(im1_pts, im2_pts)
+def mosaic(im1, im2, im1_pts=None, im2_pts=None, automatic=True, outpath=None):
+    if automatic:
+        H = get_best_H(im1, im2)
+    else:
+        H = computeH(im1_pts, im2_pts)
 
     im1 = alpha_feathering(im1)
     im2 = alpha_feathering(im2)
@@ -85,6 +93,7 @@ def mosaic(im1, im2, im1_pts, im2_pts, outpath=None):
 
     mosaic_box1 = np.zeros((mosaic_height, mosaic_width, im1.shape[2]))
     mosaic_box2 = np.zeros((mosaic_height, mosaic_width, im1.shape[2]))
+
     row_im1 = min_row - min(0, min_row)
     col_im1 = min_col - min(0, min_col)
 
@@ -104,11 +113,12 @@ def mosaic(im1, im2, im1_pts, im2_pts, outpath=None):
     mosaic_box1 = mosaic_box1[:,:,:3]
     mosaic_box2 = mosaic_box2[:,:,:3]
 
-    combined = oraple_stack(mosaic_box1, mosaic_box2, 35, 2, out_path=None, mask=mask)
+    combined = oraple_stack(mosaic_box1, mosaic_box2, 25, 2, out_path=None, mask=mask)
     combined = np.clip(combined, 0,1)
 
     display_save_image(combined, outpath)
     return combined
+
 
 
 def alpha_feathering(im):
@@ -124,6 +134,7 @@ def alpha_feathering(im):
     alpha_channel = np.minimum.outer(rows, cols) / max_dist
 
     alpha_channel = np.clip(alpha_channel, 0, 1)
+
     im = np.dstack([im, alpha_channel])
     return im
 
@@ -139,35 +150,34 @@ def display_save_image(image, fname=None):
 if __name__ == '__main__':
 
     path = '/Users/meenakshimittal/Desktop/cs180/meenakshi-mittal.github.io/4/Project 4'
-    im = sk.img_as_float(skio.imread(f'{path}/rectification/laptop.JPG'))
-    im_pts_path = f'{path}/rectification/laptop_labels.csv'
-    warp_points = [[0, 240], [0, 40], [280, 240], [280, 240]]
-    im_pts = read_label_csv(im_pts_path)
 
-    H = computeH(im_pts, warp_points)
-    warpImage(im, H, f'{path}/rectification/laptop_rectified.jpg')
-
+    # image rectification
     im = sk.img_as_float(skio.imread(f'{path}/rectification/tennis2.JPG'))
-
     im_pts_path = f'{path}/rectification/tennis2_labels.csv'
     warp_points = [[0, 390], [0, 0], [180, 0], [180, 390]]
     im_pts = read_label_csv(im_pts_path)
-
     H = computeH(im_pts, warp_points)
     warped, _ = warpImage(im, H)
     display_save_image(warped, f'{path}/rectification/tennis2_rectified.jpg')
 
-
-    i1 = 'glass4'
-    i2 = 'glass3'
-    iout = 'glass34_mask'
-    im1 = sk.img_as_float(skio.imread(f'{path}/glass/images/{i1}.jpg'))
+    # manual image stitching
+    i1 = 'glass1'
+    i2 = 'glass2'
+    iout = 'glass12'
+    im1 = sk.img_as_float(skio.imread(f'{path}/glass/ransac/{i1}.jpg'))
     im1_pts_path = f'{path}/glass/points/{i1}_labels.csv'
-    im2 = sk.img_as_float(skio.imread(f'{path}/glass/images/{i2}.jpg'))
+    im2 = sk.img_as_float(skio.imread(f'{path}/glass/ransac/{i2}.jpg'))
     im2_pts_path = f'{path}/glass/points/{i2}_labels.csv'
-    #
+
     im1_pts = read_label_csv(im1_pts_path)
     im2_pts = read_label_csv(im2_pts_path)
+    mosaic(im1, im2, im1_pts, im2_pts, automatic=False, outpath=f'{path}/glass/ransac/{iout}.jpg')
 
-    mosaic(im1, im2, im1_pts, im2_pts, f'{path}/glass/images/{iout}.jpg')
+    # automatic image stitching
+    i1 = 'glass1'
+    i2 = 'glass2'
+    iout = 'glass12'
+    im1 = sk.img_as_float(skio.imread(f'{path}/glass/ransac/{i1}.jpg'))
+    im2 = sk.img_as_float(skio.imread(f'{path}/glass/ransac/{i2}.jpg'))
+    mosaic(im1, im2, automatic=True, outpath=f'{path}/glass/ransac/{iout}.jpg')
 
