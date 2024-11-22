@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Display</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            margin: 0;
+            background-color: #607d8b;
+        }
+
+        .wrapper {
+            background-color: #bfcbd1;
+            max-width: calc(100% - 2in);
+            margin: 0 auto;
+            padding-left: 0.5in;
+            padding-right: 0.5in;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .image-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 20px; /* Reduce the gap between image rows */
+            flex-wrap: nowrap;
+        }
+
+        .image-row div {
+            margin: 0 10px;
+        }
+
+        .image-row img {
+            flex-grow: 1;
+            flex-shrink: 1;
+            width: auto;
+            height: 256px;
+            max-width: 100%;
+
+            object-fit: contain;
+        }
+
+        .image-row .small-image {
+            width: auto;
+            height: 64px;
+        }
+
+        .image-row .med-image {
+            width: auto;
+            height: 128px;
+        }
+
+        .image-row .large-image {
+            width: auto;
+            height: 400px;
+        }
+
+        .image-row .larger-image {
+            width: auto;
+            height: 512px;
+        }
+
+        .scaled-image {
+            image-rendering: pixelated;
+        }
+
+        .image-label {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .arrow-right {
+            flex-grow: 0;
+            font-size: 30px;
+            margin: 0 30px;
+        }
+
+        .arrow-down {
+            text-align: center;
+            font-size: 30px;
+            margin: 10px 0 30px 0;
+        }
+
+        .variation-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            justify-items: center;
+        }
+
+        .variation-grid img {
+            width: 100%;
+        }
+
+        .variation-label {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .unbold {
+            font-weight: normal;
+        }
+
+        .auto-height-container img.auto-height-image {
+            width: auto;
+            height: 800px;
+            max-width: 100%;
+        }
+
+        .spacer {
+            width: 50px;
+            height: auto;
+            display: inline-block;
+        }
+
+        .small-image-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .small-image-row img {
+            height: 128px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        .hover-gif {
+            display: inline-block;
+            position: relative;
+<!--            width: 300px; /* Adjust the size as needed */-->
+            height: auto;
+        }
+
+        .hover-gif img.static-image {
+            display: block;
+<!--            width: 100%; /* Ensure the image fits the container */-->
+            height: auto;
+        }
+
+        .hover-gif img.gif {
+            display: none;
+<!--            width: 100%; /* Match the size of the static image */-->
+            height: auto;
+        }
+
+        .hover-gif:hover img.static-image {
+            display: none;
+        }
+
+        .hover-gif:hover img.gif {
+            display: block;
+        }
+
+    </style>
+</head>
+<body>
+
+<!--<html>-->
+<!--<head>-->
+<!--    <style>-->
+<!--        img {-->
+<!--            image-rendering: pixelated;-->
+<!--            image-rendering: crisp-edges;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--</html>-->
+
+
+<div class="wrapper">
+    <div class="section">
+        <br>
+        <h1>CS 180: Project 5</h1>
+        <h2 style="text-align: center;">Fun With Diffusion Models!</h2>
+        <h2 class="unbold" style="text-align: center">Meenakshi Mittal</h2>
+    </div>
+
+
+    <div class="section">
+        <h2>Project 5a: The Power of Diffusion Models!</h2>
+        <p>
+            In this part of the project, we will play around with a pre-trained diffusion model, DeepFloyd IF, accessed via Hugging Face.
+            We use random seed 180 (but some images displayed here were generated after rerunning the model a few times).
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Part 0: Setup</h2>
+        <p>
+            First, we see what this model can do.
+            We have it generate 64x64 images on 3 prompts, and then pass these images through again to upscale them to 256x256.
+            We test 3 different numbers of inference steps:
+            <br>
+        </p>
+    </div>
+
+    <div class="section">
+        <h4>5 inference steps:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/0_sampling/5_steps/mtn_vill.png" alt="Image 1">
+                <p class="image-label">"an oil painting of a snowy mountain village"</p>
+            </div>
+            <div>
+                <img src="media/0_sampling/5_steps/man_hat.png" alt="Image 1">
+                <p class="image-label">"a man wearing a hat"</p>
+            </div>
+            <div>
+                <img src="media/0_sampling/5_steps/rocket.png" alt="Image 2">
+                <p class="image-label">"a rocket ship"</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            With only 5 inference steps, the generated images have quite poor quality.
+            They all share an odd "pointillism" effect, with lots of tiny points obscuring the images.
+            The mountain village adheres to the prompt the most, although it doesn't really look like an oil painting. The pointillism almost looks like snow.
+            The man wearing a hat is honestly very artistic and impressionistic, and I like it a lot even though it isn't very accurate.
+            The rocket ship appears to be a mostly blank image with the rocket mostly off the screen and its smoke trailing behind it.
+        </p>
+    </div>
+
+    <div class="section">
+        <h4>20 inference steps:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/0_sampling/20_steps/mtn_vill.png" alt="Image 1">
+                <p class="image-label">"an oil painting of a snowy mountain village"</p>
+            </div>
+            <div>
+                <img src="media/0_sampling/20_steps/man_hat.png" alt="Image 1">
+                <p class="image-label">"a man wearing a hat"</p>
+            </div>
+            <div>
+                <img src="media/0_sampling/20_steps/rocket.png" alt="Image 2">
+                <p class="image-label">"a rocket ship"</p>
+            </div>
+        </div>
+    </div>
+
+     <div class="section">
+        <p>
+            20 inference steps is looking a lot better.
+            The mountain village is very easy to make out now, with bright colors and a playful art style. It looks more like an oil painting.
+            The man with a hat is less artsy and much more realistic now. There is a bit of odd contrasting and blurriness that give an uncanny valley feeling.
+            The rocket ship is much more clear to see in this image, again with a rather childish art style.
+        </p>
+    </div>
+
+    <div class="section">
+        <h4>50 inference steps:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/0_sampling/50_steps/mtn_vill.png" alt="Image 1">
+                <p class="image-label">"an oil painting of a snowy mountain village"</p>
+            </div>
+            <div>
+                <img src="media/0_sampling/50_steps/man_hat.png" alt="Image 1">
+                <p class="image-label">"a man wearing a hat"</p>
+            </div>
+            <div>
+                <img src="media/0_sampling/50_steps/rocket.png" alt="Image 2">
+                <p class="image-label">"a rocket ship"</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            At 50 inference steps, our images look really good. The mountain village is artsy and quite beautiful.
+            The man wearing a hat is a lot sharper and even more realistic than the previous one.
+            The rocket itself is of somewhat similar quality, but there is a very realistic rocky surface below it now.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Part 1: Sampling Loops</h2>
+        <p>
+            Another thing we can experiment with is how good this model is at denoising images.
+            To do this, we first need to add noise to some image.
+        </p>
+    </div>
+
+    <div class="section">
+        <h3>1.1: Implementing the Forward Process</h3>
+        <p>
+            We ideally want different "levels" of noise, so we will iteratively add noise to the image in our forward process using the following formula:
+            <br>
+            <br>
+            <img src="media/1.1_noise/Screenshot 2024-11-20 at 9.08.43 PM.png" alt="Image 1" style="height: 10%; width: 40%;">
+            <br>
+            <br>
+            Here, alpha_t_bar was chosen by the people who trained the model, and t ranges from 0 to 999. At t=0, the image is clean, and large t corresponds to more noise.
+            We will use an image of the UC Berkeley bell tower, the Campanile.
+            Here is the original image, along with the noisy versions of it at t in [250, 500, 750]:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.1_noise/campanile0.png" alt="Image 1">
+                <p class="image-label">Berkeley Campanile</p>
+            </div>
+            <div>
+                <img src="media/1.1_noise/250.png" alt="Image 1">
+                <p class="image-label">Noisy Campanile at t=250</p>
+            </div>
+            <div>
+                <img src="media/1.1_noise/500.png" alt="Image 1">
+                <p class="image-label">Noisy Campanile at t=500</p>
+            </div>
+            <div>
+                <img src="media/1.1_noise/750.png" alt="Image 1">
+                <p class="image-label">Noisy Campanile at t=750</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>1.2 Classical Denoising</h3>
+        <p>
+            Let's try to denoise these images using classical methods.
+            We will try our best to use simple Gaussian blur filtering to remove the noise.
+            For timesteps 250, 500, and 750, I used Gaussian kernel sizes of 7, 11, and 15, respectively.
+            The results leave much to be desired:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.1_noise/250.png" alt="Image 1">
+                <p class="image-label">Noisy Campanile at t=250</p>
+            </div>
+            <div>
+                <img src="media/1.1_noise/500.png" alt="Image 1">
+                <p class="image-label">Noisy Campanile at t=500</p>
+            </div>
+            <div>
+                <img src="media/1.1_noise/750.png" alt="Image 1">
+                <p class="image-label">Noisy Campanile at t=750</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.2_gaussian/250.png" alt="Image 1">
+                <p class="image-label">Gaussian Blur Denoising at t=250</p>
+            </div>
+            <div>
+                <img src="media/1.2_gaussian/500.png" alt="Image 1">
+                <p class="image-label">Gaussian Blur Denoising at t=500</p>
+            </div>
+            <div>
+                <img src="media/1.2_gaussian/750.png" alt="Image 1">
+                <p class="image-label">Gaussian Blur Denoising at t=750</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>1.3: One-Step Denoising</h3>
+        <p>
+            Now we will try using a pre-trained diffusion model to denoise these images.
+            The model we are using has been trained on a massive dataset of noisy images, and is optimized for predicting the noise in an image.
+            We can simply pass our images through this model to get their noise estimates, and then use our forward equation from above to retrieve an estimate of the cleaned image (x0).
+            We rewrite the equation in terms of x0, the clean image, and substitute our noise estimate for epsilon.
+            The results from this method are a significant step up from the Gaussian blurring approach.
+            However, while the results are higher quality, it is worth noting that the model appears to be "making up" some parts of the images that were previously obscured by the noise.
+            For instance, the denoised image from t=750 looks quite different from the actual Campanile.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.1_noise/250.png" alt="Image 1">
+                <p class="image-label">Noisy Campanile at t=250</p>
+            </div>
+            <div>
+                <img src="media/1.1_noise/500.png" alt="Image 1">
+                <p class="image-label">Noisy Campanile at t=500</p>
+            </div>
+            <div>
+                <img src="media/1.1_noise/750.png" alt="Image 1">
+                <p class="image-label">Noisy Campanile at t=750</p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.3_one_step/250.png" alt="Image 1">
+                <p class="image-label">One-Step Denoising at t=250</p>
+            </div>
+            <div>
+                <img src="media/1.3_one_step/500.png" alt="Image 1">
+                <p class="image-label">One-Step Denoising at t=500</p>
+            </div>
+            <div>
+                <img src="media/1.3_one_step/750.png" alt="Image 1">
+                <p class="image-label">One-Step Denoising at t=750</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>1.4 Iterative Denoising</h3>
+        <p>
+            The denoising UNet seems to do a petty decent job. However, we can try to make it produce even better results.
+            Instead of denoising in a single step, we will try to iteratively denoise the image.
+            We will start with a noisy image at t=690, and iteratively predict the image at 30 timesteps prior.
+            We will use the following formula to accomplish this:
+            <br>
+            <br>
+            <img src="media/1.4_iterative/Screenshot 2024-11-21 at 10.19.49 AM.png" alt="Image 1" style="height: auto; width: 30%;">
+            <br>
+        </p>
+            <ul>
+                <li>t is our "starting" timestep.</li>
+                <li>t' is the less noisy timestep that we are predicting.</li>
+                <li>alpha_t_bar is defined as it was previously.</li>
+                <li>alpha_t = alpha_t_bar / alpha_t'_bar.</li>
+                <li>beta_t = 1-alpha_t.</li>
+                <li>x0 is an estimate of the clean image, using the one-step denoising above.</li>
+            </ul>
+        <p>
+            Below, we see 5 steps of the iterative denoising process.
+            We also see each of our 3 denoising methods compared side by side.
+            For the Gaussian blurred one, I chose a kernel size of 13.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.4_iterative/690.png" alt="Image 1">
+                <p class="image-label">Noisy Campanile at t=690</p>
+            </div>
+            <div>
+                <img src="media/1.4_iterative/540.png" alt="Image 1">
+                <p class="image-label">Noisy Campanile at t=540</p>
+            </div>
+            <div>
+                <img src="media/1.4_iterative/390.png" alt="Image 1">
+                <p class="image-label">Noisy Campanile at t=390</p>
+            </div>
+            <div>
+                <img src="media/1.4_iterative/240.png" alt="Image 1">
+                <p class="image-label">Noisy Campanile at t=240</p>
+            </div>
+            <div>
+                <img src="media/1.4_iterative/90.png" alt="Image 1">
+                <p class="image-label">Noisy Campanile at t=90</p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.1_noise/campanile0.png" alt="Image 1">
+                <p class="image-label">Berkeley Campanile</p>
+            </div>
+            <div>
+                <img src="media/1.4_iterative/0.png" alt="Image 1">
+                <p class="image-label">Iteratively Denoised Campanile</p>
+            </div>
+            <div>
+                <img src="media/1.4_iterative/one_step.png" alt="Image 1">
+                <p class="image-label">One-Step Denoised Campanile</p>
+            </div>
+            <div>
+                <img src="media/1.4_iterative/gaussian.png" alt="Image 1">
+                <p class="image-label">Gaussian Blurred Campanile</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>1.5 Diffusion Model Sampling</h3>
+        <p>
+            Now we will move on from the Campanile and see if we can get our model to generate "high quality" images from pure noise.
+            We will use a similar iterative denoising process, except now starting from t=990 and using the prompt "a high quality photo":
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.5_diffusion_samplng/5.png" alt="Image 1">
+                <p class="image-label">Sample 1</p>
+            </div>
+            <div>
+                <img src="media/1.5_diffusion_samplng/6.png" alt="Image 1">
+                <p class="image-label">Sample 2</p>
+            </div>
+            <div>
+                <img src="media/1.5_diffusion_samplng/7.png" alt="Image 1">
+                <p class="image-label">Sample 3</p>
+            </div>
+            <div>
+                <img src="media/1.5_diffusion_samplng/8.png" alt="Image 1">
+                <p class="image-label">Sample 4</p>
+            </div>
+            <div>
+                <img src="media/1.5_diffusion_samplng/9.png" alt="Image 1">
+                <p class="image-label">Sample 5</p>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="section">
+        <h3>1.6 Classifier-Free Guidance (CFG)</h3>
+        <p>
+            The images above are decent, but a bit strange and hard to make out.
+            To improve the quality of our images, we will use a technique called "classifier-free guidance", or CFG.
+            Here, we compute both a conditional and unconditional noise estimate, and then combine them using the following equation:
+            <br>
+            <br>
+            <img src="media/1.6_cfg/Screenshot 2024-11-21 at 10.59.58 AM.png" alt="Image 1" style="height: auto; width: 20%;">
+            <br>
+            <br>
+            For &gamma; = 0 we get an unconditional noise estimate and for &gamma; = 1 we get the conditional noise estimate.
+            For some unknown reason, setting &gamma; > 1 gives much higher quality images.
+            The images appear to have higher contrast, more vivid colors, and just better composition overall.
+            Here is a sample of images with &gamma; = 7:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.6_cfg/5.png" alt="Image 1">
+                <p class="image-label">Sample 1</p>
+            </div>
+            <div>
+                <img src="media/1.6_cfg/6.png" alt="Image 1">
+                <p class="image-label">Sample 2</p>
+            </div>
+            <div>
+                <img src="media/1.6_cfg/7.png" alt="Image 1">
+                <p class="image-label">Sample 3</p>
+            </div>
+            <div>
+                <img src="media/1.6_cfg/8.png" alt="Image 1">
+                <p class="image-label">Sample 4</p>
+            </div>
+            <div>
+                <img src="media/1.6_cfg/9.png" alt="Image 1">
+                <p class="image-label">Sample 5</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>1.7 Image-to-image Translation</h3>
+        <p>
+            One way to think about the denoising process from earlier is that it "forces" a noisy image back onto the manifold of natural images.
+            We can have some fun by denoising images using iterative CFG denoising, allowing the model to creatively fill in the unknown parts itself.
+            Below are 3 images that I applied this approach, known as the SDEdit algorithm, at varying noise levels:
+        </p>
+    </div>
+
+    <div class="section">
+        <h4>Campanile:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/1.1_noise/campanile0.png" alt="Image 1">
+                <p class="image-label">Original Image</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/camp/1.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=1</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/camp/3.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=3</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/camp/5.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=5</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/camp/7.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=7</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/camp/10.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=10</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/camp/20.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=20</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Vase with fruit:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/1.7_im_to_im/still_life/orig.png" alt="Image 1">
+                <p class="image-label">Original Image</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/still_life/1.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=1</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/still_life/3.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=3</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/still_life/5.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=5</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/still_life/7.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=7</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/still_life/10.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=10</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/still_life/20.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=20</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Astronaut:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/1.7_im_to_im/astro/orig.png" alt="Image 1">
+                <p class="image-label">Original Image</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/astro/1.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=1</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/astro/3.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=3</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/astro/5.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=5</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/astro/7.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=7</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/astro/10.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=10</p>
+            </div>
+            <div>
+                <img src="media/1.7_im_to_im/astro/20.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=20</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>1.7.1 Editing Hand-Drawn and Web Images</h3>
+        <p>
+            We will repeat the process above with less realistic images, i.e., animated images from the web
+            and our own hand-drawn images:
+        </p>
+    </div>
+
+    <div class="section">
+        <h4>Simba from The Lion King:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/1.7.1_edits/simba/orig.png" alt="Image 1">
+                <p class="image-label">Original Image</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/simba/1.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=1</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/simba/3.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=3</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/simba/5.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=5</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/simba/7.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=7</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/simba/10.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=10</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/simba/20.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=20</p>
+            </div>
+        </div>
+    </div>
+    <div class="section">
+        <h4>Hand-drawn image of a beach:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/1.7.1_edits/beach/beach.png" alt="Image 1">
+                <p class="image-label">Original Image</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/beach/1.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=1</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/beach/3.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=3</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/beach/5.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=5</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/beach/7.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=7</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/beach/10.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=10</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/beach/20.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=20</p>
+            </div>
+        </div>
+    </div>
+    <div class="section">
+        <h4>Hand-drawn image of a forest:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/1.7.1_edits/forest/forest.png" alt="Image 1">
+                <p class="image-label">Original Image</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/forest/1.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=1</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/forest/3.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=3</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/forest/5.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=5</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/forest/7.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=7</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/forest/10.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=10</p>
+            </div>
+            <div>
+                <img src="media/1.7.1_edits/forest/20.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=20</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>1.7.2 Inpainting</h3>
+        <p>
+            We can also use these ideas to "inpaint" an image. In other words, we can
+            keep some part of an image the same, and let the diffusion model replace the other part.
+            We do this by first creating a mask, and then running the regular CFG denoising loop with the
+            following formula applied at each step:
+            <br>
+            <br>
+            <img src="media/1.7.2_inpainting/Screenshot 2024-11-21 at 12.08.01 PM.png" alt="Image 1" style="height: auto; width: 30%;">
+            <br>
+            <br>
+            This formula leaves everything inside the edit mask alone, but replaces everything outside the mask with our original image with the correct noise level.
+            Here are some inpainting examples:
+        </p>
+    </div>
+
+     <div class="section">
+        <h4>Campanile:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/1.7.2_inpainting/campanile/image.png" alt="Image 1">
+                <p class="image-label">Original Image</p>
+            </div>
+            <div>
+                <img src="media/1.7.2_inpainting/campanile/mask.png" alt="Image 1">
+                <p class="image-label">Mask</p>
+            </div>
+            <div>
+                <img src="media/1.7.2_inpainting/campanile/to_replace.png" alt="Image 1">
+                <p class="image-label">Hole to Fill</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/1.7.2_inpainting/campanile/replaced.png" alt="Image 1">
+                <p class="image-label">Inpainted 1</p>
+            </div>
+            <div>
+                <img src="media/1.7.2_inpainting/campanile/replaced2.png" alt="Image 1">
+                <p class="image-label">Inpainted 2</p>
+            </div>
+            <div>
+                <img src="media/1.7.2_inpainting/campanile/replaced4.png" alt="Image 1">
+                <p class="image-label">Inpainted 3</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Taylor Swift:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/1.7.2_inpainting/taylor/image.png" alt="Image 1">
+                <p class="image-label">Original Image</p>
+            </div>
+            <div>
+                <img src="media/1.7.2_inpainting/taylor/mask.png" alt="Image 1">
+                <p class="image-label">Mask</p>
+            </div>
+            <div>
+                <img src="media/1.7.2_inpainting/taylor/to_replace.png" alt="Image 1">
+                <p class="image-label">Hole to Fill</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/1.7.2_inpainting/taylor/replaced.png" alt="Image 1">
+                <p class="image-label">Inpainted 1</p>
+            </div>
+            <div>
+                <img src="media/1.7.2_inpainting/taylor/replaced3.png" alt="Image 1">
+                <p class="image-label">Inpainted 2</p>
+            </div>
+            <div>
+                <img src="media/1.7.2_inpainting/taylor/replaced4.png" alt="Image 1">
+                <p class="image-label">Inpainted 3</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Taj Mahal:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/1.7.2_inpainting/taj/image.png" alt="Image 1">
+                <p class="image-label">Original Image</p>
+            </div>
+            <div>
+                <img src="media/1.7.2_inpainting/taj/mask.png" alt="Image 1">
+                <p class="image-label">Mask</p>
+            </div>
+            <div>
+                <img src="media/1.7.2_inpainting/taj/to_replace.png" alt="Image 1">
+                <p class="image-label">Hole to Fill</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/1.7.2_inpainting/taj/replaced.png" alt="Image 1">
+                <p class="image-label">Inpainted 1</p>
+            </div>
+            <div>
+                <img src="media/1.7.2_inpainting/taj/replaced2.png" alt="Image 1">
+                <p class="image-label">Inpainted 2</p>
+            </div>
+            <div>
+                <img src="media/1.7.2_inpainting/taj/replaced3.png" alt="Image 1">
+                <p class="image-label">Inpainted 3</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>1.7.3 Text-Conditional Image-to-image Translation</h3>
+        <p>
+            Until now, we have always been using the prompt "a high quality photo". However, we
+            can influence the projection of the image onto the natural image manifold
+            by providing it with a natural language prompt to adhere to. Here are some examples
+            of this:
+        </p>
+    </div>
+
+    <div class="section">
+        <h4>Campanile, with prompt "a rocket ship":</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/1.7.3_text_cond/campanile_rocket/image.png" alt="Image 1">
+                <p class="image-label">Original Image</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/campanile_rocket/1.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=1</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/campanile_rocket/3.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=3</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/campanile_rocket/5.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=5</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/campanile_rocket/7.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=7</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/campanile_rocket/10.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=10</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/campanile_rocket/20.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=20</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Cat, with prompt "a photo of a dog":</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/1.7.3_text_cond/cat_dog/image.png" alt="Image 1">
+                <p class="image-label">Original Image</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/cat_dog/1.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=1</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/cat_dog/3.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=3</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/cat_dog/5.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=5</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/cat_dog/7.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=7</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/cat_dog/10.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=10</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/cat_dog/20.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=20</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Billie Eilish, with prompt "a man wearing a hat":</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/1.7.3_text_cond/billie_man_hat/image.png" alt="Image 1">
+                <p class="image-label">Original Image</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/billie_man_hat/1.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=1</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/billie_man_hat/3.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=3</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/billie_man_hat/5.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=5</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/billie_man_hat/7.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=7</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/billie_man_hat/10.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=10</p>
+            </div>
+            <div>
+                <img src="media/1.7.3_text_cond/billie_man_hat/20.png" alt="Image 1">
+                <p class="image-label">SDEdit, i_start=20</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>1.8 Visual Anagrams</h3>
+        <p>
+            Now we can try some really cool techniques.
+            We will create visual anagrams that change appearance when flipping upside down.
+            We can do this using our current prompted denoising approach.
+            At every step, we find the noise estimate of the image using one prompt, and
+            we also flip it upside down and find the noise estimate using a different prompt.
+            Then we average these 2 noise estimates and take a denoising step.
+            Here is the algorithm used to compute the noise estimate:
+            <br>
+            <br>
+            <img src="media/1.8_anagrams/Screenshot 2024-11-21 at 12.34.43 PM.png" alt="Image 1" style="height: auto; width: 20%;">
+            <br>
+            <br>
+            I had to try many different combinations of prompts and rerun the model several times to get good results.
+            Here are 3 best visual anagrams I could create using this algorithm:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.8_anagrams/try2/fire.png" alt="Image 1">
+                <p class="image-label">"an oil painting of people around a campfire"</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/1.8_anagrams/try2/man.png" alt="Image 1">
+                <p class="image-label">"an oil painting of an old man"</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.8_anagrams/lady_old/lady2.png" alt="Image 1">
+                <p class="image-label">"an oil painting of a young woman"</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/1.8_anagrams/lady_old/old2.png" alt="Image 1">
+                <p class="image-label">"an oil painting of an old lady"</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.8_anagrams/ship_ballet/ballet.png" alt="Image 1">
+                <p class="image-label">"an oil painting of a ballet dancer with a tutu"</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/1.8_anagrams/ship_ballet/ship.png" alt="Image 1">
+                <p class="image-label">"an oil painting of a ship in the ocean"</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>1.9 Hybrid Images</h3>
+        <p>
+            We can use a somewhat similar process to create "hybrid images", similar to the ones we created in Project 2.
+            We will use a method called Factorized Diffusion, where we compute noise estimates of the image using
+            2 different prompts, and then add the lowpass version of one with the highpass version of the other.
+            Here is the algorithm we use:
+            <br>
+            <br>
+            <img src="media/1.10_hybrid/Screenshot 2024-11-21 at 1.05.23 PM.png" alt="Image 1" style="height: auto; width: 20%;">
+            <br>
+            <br>
+            I used a Gaussian blur with kernel size 33 and sigma 2 for the lowpass filter.
+            For the highpass filter, I use the same Gaussian filter and subtract the resulting image from the original.
+            I again had to try many different combinations of prompts and rerun the model several times to get good results.
+            Here are the 6 best hybrid images I could create, with 2 for each pair of prompts:
+        </p>
+    </div>
+
+    <div class="section">
+        <h4>Highpass prompt: "a lithograph of waterfalls"</h4>
+        <h4>Lowpass prompt: "a lithograph of a skull"</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.10_hybrid/skull_wf.png" alt="Image 1">
+                <p class="image-label">Waterfalls</p>
+            </div>
+            <div>
+                <img src="media/1.10_hybrid/skull_wf.png" alt="Image 1" class="small-image">
+                <p class="image-label">Skull</p>
+            </div>
+            <div>
+                <img src="media/1.10_hybrid/skull_wf2.png" alt="Image 1">
+                <p class="image-label">Waterfalls</p>
+            </div>
+            <div>
+                <img src="media/1.10_hybrid/skull_wf2.png" alt="Image 1" class="small-image">
+                <p class="image-label">Skull</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Highpass prompt: "an oil painting of people dancing"</h4>
+        <h4>Lowpass prompt: "a photo of a cat"</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.10_hybrid/dance_cat.png" alt="Image 1">
+                <p class="image-label">People Dancing</p>
+            </div>
+            <div>
+                <img src="media/1.10_hybrid/dance_cat.png" alt="Image 1" class="small-image">
+                <p class="image-label">Cat</p>
+            </div>
+            <div>
+                <img src="media/1.10_hybrid/dance_cat2.png" alt="Image 1">
+                <p class="image-label">People Dancing</p>
+            </div>
+            <div>
+                <img src="media/1.10_hybrid/dance_cat2.png" alt="Image 1" class="small-image">
+                <p class="image-label">Cat</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Highpass prompt: "an oil painting of flowers in a vase"</h4>
+        <h4>Lowpass prompt: "a photo of a rubber duck"</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/1.10_hybrid/flower_duck3.png" alt="Image 1">
+                <p class="image-label">Flowers</p>
+            </div>
+            <div>
+                <img src="media/1.10_hybrid/flower_duck3.png" alt="Image 1" class="small-image">
+                <p class="image-label">Rubber Duck</p>
+            </div>
+            <div>
+                <img src="media/1.10_hybrid/flower_duck2.png" alt="Image 1">
+                <p class="image-label">Flowers</p>
+            </div>
+            <div>
+                <img src="media/1.10_hybrid/flower_duck2.png" alt="Image 1" class="small-image">
+                <p class="image-label">Rubber Duck</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            That's the end of the first part of the project! I thought it was really fun to
+            influence the denoising process of a powerful pre-trained diffusion model,
+            allowing for creativity from both myself and the model.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Project 5b: Diffusion Models from Scratch!</h2>
+        <p>
+            Now we will build our own diffusion models!
+            We unfortunately don't have the resources to train a model as powerful as the DeepFloyd one from the previous part,
+            but we can train a pretty decent one that denoises and generates black-and-white MNIST handwritten digits.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Part 1: Training a Single-Step Denoising UNet</h2>
+        <p>
+            We would like to start by training a simple one-step denoiser.
+        </p>
+        <h3>1.1 Implementing the UNet</h3>
+        <p>
+            We construct the primary architecture of our model, with the help of the pytorch library.
+            Our UNet has the following architecture, and uses a simple L2 loss:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/1.1/model.png" alt="Image 1" class="large-image">
+                <p class="image-label">UNet Architecture</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/1.1/ops.png" alt="Image 1" class="large-image">
+                <p class="image-label">Fine-grained operations in UNet</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>1.2 Using the UNet to Train a Denoiser</h3>
+        <p>
+            Our first step is to create our training set.
+            We need to manually add noise to the MNIST dataset, and we want to add it with varying degrees of intensity.
+            We use the following equation to do this:
+            <br>
+            <br>
+            z = x + &sigma;&epsilon;, where &epsilon; &sim; N(0, I).
+            <br>
+            <br>
+            Here is a sample of our noisy images:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/1.2/noise.png" alt="Image 1" class="larger-image">
+                <p class="image-label">Levels of noise on MNIST digits</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>1.2.1 Training</h3>
+        <p>
+            We train our UNet to denoise images with noise level &sigma; = 0.5.
+            We use a batch size of 256, hidden dimension of 128, train for 5 epochs,
+            and use Adam optimizer with a learning rate of 1e-4.
+            <br>
+            <br>
+            After training, I got the following loss curve:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/1.2.1/loss.png" alt="Image 1" class="large-image">
+                <p class="image-label">Loss curve</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>1.2.1 Training</h3>
+        <p>
+            Sampling from the 1st and 5th epochs gives me the following results:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/1.2.1/epoch1.png" alt="Image 1" class="larger-image">
+                <p class="image-label">Epoch 1</p>
+            </div>
+            <div>
+                <img src="media2/1.2.1/epoch5.png" alt="Image 1" class="larger-image">
+                <p class="image-label">Epoch 5</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            The denoised images at epoch 5 look almost identical to the originals!
+            This tells us our model is performing as desired.
+        </p>
+        <h3>1.2.2 Out-of-Distribution Testing</h3>
+        <p>
+            This model was trained specifically to denoise images with &sigma; = 0.5.
+            Let's see how it performs on images with other noise levels, like the ones we used to noise our images above:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/1.2.2/epoch1.png" alt="Image 1">
+                <p class="image-label">Epoch 1</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/1.2.2/epoch5.png" alt="Image 1">
+                <p class="image-label">Epoch 5</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            These results are not quite as good. The model still does a decent job at denoising the
+            images at higher noise levels, but it is quite clear that it was not trained for this task.
+        </p>
+        <h2>Part 2: Training a Diffusion Model</h2>
+        <p>
+            Now it's time to try and train diffusion models!
+            We will train a UNet model that can iteratively denoise an image, similar to the process from part A.
+            The goal here is that we can eventually sample images from pure noise using this model,
+            effectively having it generate high quality digits of its own.
+            <br>
+            <br>
+            There are a few major changes we need to make to our model setup.
+            Firstly, we want our model to predict the noise within an image rather than the clean image itself.
+            We can do this by simply making our loss function the MSE between the predicted and actual noise.
+            We also need to incorporate the timestep into this procedure somehow, as our denoising now depends on the timestep we are at.
+            We use the iterative noising equation from part A to model our image noising:
+            <br>
+            <br>
+            <img src="media/1.1_noise/Screenshot 2024-11-20 at 9.08.43 PM.png" alt="Image 1" style="height: 10%; width: 30%;">
+            <br>
+            <br>
+            Along with the following loss function:
+            <br>
+            <br>
+            <img src="media2/2.1/Screenshot 2024-11-21 at 8.37.44 PM.png" alt="Image 1" style="height: 10%; width: 20%;">
+        </p>
+    </div>
+
+    <div class="section">
+        <h3>2.1 Adding Time Conditioning to UNet</h3>
+        <p>
+            As stated above, we need to add time-conditioning into our UNet architecture.
+            The suggested way to do so is as follows:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/2.1/model.png" alt="Image 1" class="large-image">
+                <p class="image-label">Time-conditioned UNet Architecture</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            The newly introduced FCBlock in the above architecture looks like this:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/2.1/fc.png" alt="Image 1" class="med-image">
+                <p class="image-label">FCBlock</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>2.2 Training the UNet</h3>
+        <p>
+            Now we train the UNet using the following algorithm:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/2.2/alg.png" alt="Image 1" class="med-image">
+                <p class="image-label">Training Algorithm</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            We train using batch size 128 and hidden dimension 64 for 20 epochs,
+            and Adam optimizer with initial learning rate of 1e-3 and gamma of 0.1^(1.0/num_epochs).
+            We get the following loss curve:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/2.2/loss.png" alt="Image 1" class="large-image">
+                <p class="image-label">Loss curve</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>2.3 Sampling from the UNet</h3>
+        <p>
+            We have our trained UNet, so now we can sample from it.
+            To do this, we can use a very similar algorithm to the one we used in part A:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/2.3/alg.png" alt="Image 1" class="med-image">
+                <p class="image-label">Sampling Algorithm</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Here are samples from epochs 1, 5, 10, 15, and 20. Please hover your mouse over the image to play the denoising gif.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div class="hover-gif">
+                <img src="media2/2.3/epoch_1.png" alt="Static Image" class="static-image">
+                <img src="media2/2.3/epoch_1.gif" alt="GIF" class="gif">
+                <p class="image-label">Epoch 1</p>
+            </div>
+            <div class="hover-gif">
+                <img src="media2/2.3/epoch_5.png" alt="Static Image" class="static-image">
+                <img src="media2/2.3/epoch_5.gif" alt="GIF" class="gif">
+                <p class="image-label">Epoch 5</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div class="hover-gif">
+                <img src="media2/2.3/epoch_10.png" alt="Static Image" class="static-image">
+                <img src="media2/2.3/epoch_10.gif" alt="GIF" class="gif">
+                <p class="image-label">Epoch 10</p>
+            </div>
+            <div class="hover-gif">
+                <img src="media2/2.3/epoch_15.png" alt="Static Image" class="static-image">
+                <img src="media2/2.3/epoch_15.gif" alt="GIF" class="gif">
+                <p class="image-label">Epoch 15</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div class="hover-gif">
+                <img src="media2/2.3/epoch_20.png" alt="Static Image" class="static-image">
+                <img src="media2/2.3/epoch_20.gif" alt="GIF" class="gif">
+                <p class="image-label">Epoch 20</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>2.4 Adding Class-Conditioning to UNet</h3>
+        <p>
+            Clearly, the digits produced above are mostly not real numerical digits.
+            We also currently have no way to ask the model to output specific digits that we want.
+            We will now add class-conditioning on top of the existing time-conditioned UNet in order
+            to give us this control for image generation.
+            <br>
+            <br>
+            To do this, we one-hot encode the image labels during training, pass it through 2 separate FCBlocks
+            as defined above, and then multiply the same unflattening and upsampling steps
+            (that we are already conditioning with t) by the outputs we get.
+            <br>
+            <br>
+            We will also incorporate dropout here, where we set the one-hot encoded vector to all zeros
+            10% of the time, so that the model still learns to generate unconditionally.
+            Here is the algorithm we use for training:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/2.4/alg.png" alt="Image 1" class="med-image">
+                <p class="image-label">Training Algorithm</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            We train using the same parameters as the previous model.
+            We get the following loss curve:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/2.4/loss.png" alt="Image 1" class="large-image">
+                <p class="image-label">Loss curve</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>2.5 Sampling from the Class-Conditioned UNet</h3>
+        <p>
+            Now we can sample from this model, using a very similar algorithm to the one we used for the time-conditioned model.
+            Here, we have the addition of &gamma;, which we will set to 5.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media2/2.3/alg.png" alt="Image 1" class="med-image">
+                <p class="image-label">Sampling Algorithm</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Here are samples from epochs 1, 5, 10, 15, and 20. Please hover your mouse over the image to play the denoising gif.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div class="hover-gif">
+                <img src="media2/2.5/epoch_1.png" alt="Static Image" class="static-image">
+                <img src="media2/2.5/epoch_1.gif" alt="GIF" class="gif">
+                <p class="image-label">Epoch 1</p>
+            </div>
+            <div class="hover-gif">
+                <img src="media2/2.5/epoch_5.png" alt="Static Image" class="static-image">
+                <img src="media2/2.5/epoch_5.gif" alt="GIF" class="gif">
+                <p class="image-label">Epoch 5</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div class="hover-gif">
+                <img src="media2/2.5/epoch_10.png" alt="Static Image" class="static-image">
+                <img src="media2/2.5/epoch_10.gif" alt="GIF" class="gif">
+                <p class="image-label">Epoch 10</p>
+            </div>
+            <div class="hover-gif">
+                <img src="media2/2.5/epoch_15.png" alt="Static Image" class="static-image">
+                <img src="media2/2.5/epoch_15.gif" alt="GIF" class="gif">
+                <p class="image-label">Epoch 15</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div class="hover-gif">
+                <img src="media2/2.5/epoch_20.png" alt="Static Image" class="static-image">
+                <img src="media2/2.5/epoch_20.gif" alt="GIF" class="gif">
+                <p class="image-label">Epoch 20</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Looking good! We have finally reached the end of the project.
+            I think this project was the most fascinating one we have built this semester.
+            With the rise of multimodal models these days that generate and understand images perfectly,
+            the whole thing seems like magic. It's cool to finally understand how these models work and
+            to get my hands dirty with an actual, simple implementation from scratch.
+        </p>
+    </div>
+
+    <div class="section">
+        <p>
+            <br>
+            <br>
+            <br>
+            <br>
+        </p>
+    </div>
+
+    <script>
+        document.querySelectorAll('.hover-gif img').forEach(gifImage => {
+            gifImage.addEventListener('mouseenter', () => {
+                const gifSrc = gifImage.src;
+                gifImage.src = '';
+                gifImage.src = gifSrc;
+            });
+        });
+    </script>
+
+</body>
+</html>
