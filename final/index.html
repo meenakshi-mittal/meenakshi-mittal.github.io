@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Display</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            margin: 0;
+            background-color: #607d8b;
+        }
+
+        .wrapper {
+            background-color: #bfcbd1;
+            max-width: calc(100% - 2in);
+            margin: 0 auto;
+            padding-left: 0.5in;
+            padding-right: 0.5in;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .image-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 20px; /* Reduce the gap between image rows */
+            flex-wrap: nowrap;
+        }
+
+        .image-row div {
+            margin: 0 10px;
+        }
+
+        .image-row img {
+            flex-grow: 1;
+            flex-shrink: 1;
+            width: auto;
+            height: 256px;
+            max-width: 100%;
+
+            object-fit: contain;
+        }
+
+        .image-row .small-image {
+            width: auto;
+            height: 64px;
+        }
+
+        .image-row .med-image {
+            width: auto;
+            height: 128px;
+        }
+
+        .image-row .large-image {
+            width: auto;
+            height: 400px;
+        }
+
+        .image-row .larger-image {
+            width: auto;
+            height: 512px;
+        }
+
+        .scaled-image {
+            image-rendering: pixelated;
+        }
+
+        .image-label {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .arrow-right {
+            flex-grow: 0;
+            font-size: 30px;
+            margin: 0 30px;
+        }
+
+        .arrow-down {
+            text-align: center;
+            font-size: 30px;
+            margin: 10px 0 30px 0;
+        }
+
+        .variation-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            justify-items: center;
+        }
+
+        .variation-grid img {
+            width: 100%;
+        }
+
+        .variation-label {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .unbold {
+            font-weight: normal;
+        }
+
+        .auto-height-container img.auto-height-image {
+            width: auto;
+            height: 800px;
+            max-width: 100%;
+        }
+
+        .spacer {
+            width: 50px;
+            height: auto;
+            display: inline-block;
+        }
+
+        .small-image-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .small-image-row img {
+            height: 128px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+    </style>
+</head>
+<body>
+
+<html>
+<head>
+    <style>
+        img {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+    </style>
+</head>
+</html>
+
+
+<div class="wrapper">
+    <div class="section">
+        <br>
+        <h1>CS 180: Final Project</h1>
+        <h2 style="text-align: center;">Tour Into the Picture and Light Field Camera</h2>
+        <h2 style="text-align: center;" class="unbold">Meenakshi Mittal</h2>
+    </div>
+
+    <div class="section">
+        <p>
+            The first project we will take a look at is tour into the picture, where we create 3-dimensional models of 2-dimensional images with one point perspective.
+            The second project is light field camera, where we use grids of images from the Stanford Light Field Archive to focus an image at different depths and adjust aperture.
+        </p>
+    </div>
+
+
+    <div class="section">
+        <h2>Project 1: Tour Into the Picture</h2>
+        <p>
+            This project requires that we use images with one point perspective.
+            I selected the following 4 images to model in 3D, 2 of which are paintings and 2 of which I captured myself:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row med-image-row">
+            <div>
+                <img src="media/tour_into_picture/images/acapella.jpg" alt="Image 1">
+                <p class="image-label">Acapella Show</p>
+            </div>
+            <div>
+                <img src="media/tour_into_picture/images/chair.jpg" alt="Image 1">
+                <p class="image-label">White Room - Harry Steen</p>
+            </div>
+            <div>
+                <img src="media/tour_into_picture/images/sjerome.jpg" alt="Image 2">
+                <p class="image-label">St. Jerome - Henry Steinwick</p>
+            </div>
+            <div>
+                <img src="media/tour_into_picture/images/cons2.jpg" alt="Image 2">
+                <p class="image-label">San Francisco</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            The first step is to identify the 5 planes of the images that we wish to reconstruct.
+            These planes are the back wall, left wall, right wall, floor, and ceiling.
+            The provided MATLAB starter code helps us identify these walls by specifying the back wall and vanishing point.
+            The plane segmentation is shown here (the lines are thin-- I suggest zooming in to see them):
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row med-image-row">
+            <div>
+                <img src="media/tour_into_picture/images/fig1/acapella.jpg" alt="Image 1">
+                <p class="image-label">Acapella Show</p>
+            </div>
+            <div>
+                <img src="media/tour_into_picture/images/fig1/chair.jpg" alt="Image 1">
+                <p class="image-label">White Room - Harry Steen</p>
+            </div>
+            <div>
+                <img src="media/tour_into_picture/images/fig1/sjerome.jpg" alt="Image 2">
+                <p class="image-label">St. Jerome - Henry Steinwick</p>
+            </div>
+            <div>
+                <img src="media/tour_into_picture/images/fig1/cons2.jpg" alt="Image 2">
+                <p class="image-label">San Francisco</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Now, we can reuse our code from project 4 to rectify each of the planes into rectangles.
+            Note that this is necessary because all the planes other than the back wall appear as trapezoids in one point perspective.
+            This process involves taking the 4 corners of each plane and computing the homography matrix that maps them to the corners of a rectangle.
+            Once we have the matrix, we can map the full plane into a rectangle.
+            The back wall dimensions are used for the height and width, and the depth is estimated (as we do not know the focal length of the cameras used for each image).
+            Once we have our 5 rectangular planes, we can use MATLAB's built-in warp function to piece them together into a 3D model.
+            Here are some "novel" viewpoints of each of the images:
+        </p>
+    </div>
+
+    <div class="section">
+        <h4>Acapella Show</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row med-image-row">
+            <div>
+                <img src="media/tour_into_picture/images/acapella.jpg" alt="Image 1">
+                <p class="image-label">Original</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/tour_into_picture/images/views/aca1.png" alt="Image 1">
+                <p class="image-label">View 1</p>
+            </div>
+            <div>
+                <img src="media/tour_into_picture/images/views/aca2.png" alt="Image 1">
+                <p class="image-label">View 2</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>White Room - Harry Steen</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row med-image-row">
+            <div>
+                <img src="media/tour_into_picture/images/chair.jpg" alt="Image 1">
+                <p class="image-label">Original</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/tour_into_picture/images/views/chair1.png" alt="Image 1">
+                <p class="image-label">View 1</p>
+            </div>
+            <div>
+                <img src="media/tour_into_picture/images/views/chair2.png" alt="Image 1">
+                <p class="image-label">View 2</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>St. Jerome - Henry Steinwick</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row med-image-row">
+            <div>
+                <img src="media/tour_into_picture/images/sjerome.jpg" alt="Image 1">
+                <p class="image-label">Original</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/tour_into_picture/images/views/sjerome1.png" alt="Image 1">
+                <p class="image-label">View 1</p>
+            </div>
+            <div>
+                <img src="media/tour_into_picture/images/views/sjerome2.png" alt="Image 1">
+                <p class="image-label">View 2</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>San Francisco</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row med-image-row">
+            <div>
+                <img src="media/tour_into_picture/images/cons2.jpg" alt="Image 1">
+                <p class="image-label">Original</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/tour_into_picture/images/views/cons21.png" alt="Image 1">
+                <p class="image-label">View 1</p>
+            </div>
+            <div>
+                <img src="media/tour_into_picture/images/views/cons22.png" alt="Image 1">
+                <p class="image-label">View 2</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            These images do not quite capture the full beauty of this reconstruction; let's take a look at some video tours-into-the-pictures!
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/tour_into_picture/images/video/acapella.gif" alt="Image 1" class="large-image">
+                <p class="image-label">Acapella Show</p>
+            </div>
+            <div>
+                <img src="media/tour_into_picture/images/video/chair.gif" alt="Image 1" class="large-image">
+                <p class="image-label">White Room - Harry Steen</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/tour_into_picture/images/video/sjerome.gif" alt="Image 1" class="large-image">
+                <p class="image-label">St. Jerome - Henry Steinwick</p>
+            </div>
+            <div>
+                <img src="media/tour_into_picture/images/video/cons2.gif" alt="Image 1" class="large-image">
+                <p class="image-label">San Francisco</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Bells and Whistles</h3>
+        <p>
+            You may have noticed that 3 of the 4 reconstructions contain protruding foreground objects. We will discuss those now.
+            There are a few steps involved in creating additional planes for foreground objects-- object selection, inpainting, alpha masking, and calculating geometry.
+        </p>
+        <h4>Object Selection</h4>
+        <p>
+            I added a step that allows the user to select rectangles around their desired foreground objects, after selecting the back wall and vanishing point.
+            Here are the foreground objects selected for each image (the acapella show does not have any obvious foreground objects, so it was excluded here):
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row med-image-row">
+            <div>
+                <img src="media/tour_into_picture/images/fig2/chair.jpg" alt="Image 1">
+                <p class="image-label">White Room - Harry Steen</p>
+            </div>
+            <div>
+                <img src="media/tour_into_picture/images/fig2/sjerome.jpg" alt="Image 2">
+                <p class="image-label">St. Jerome - Henry Steinwick</p>
+            </div>
+            <div>
+                <img src="media/tour_into_picture/images/fig2/cons2.jpg" alt="Image 2">
+                <p class="image-label">San Francisco</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Inpainting</h4>
+        <p>
+            After selecting the foreground objects, we want to "inpaint" the space they take up in the original image so that they do not appear twice.
+            The inpainting is done using MATLAB's region fill function, which interpolates pixel values in the desired regions using the surrounding pixels.
+            Here is an example of inpainted foreground objects:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row med-image-row">
+            <div>
+                <img src="media/tour_into_picture/images/sjerome.jpg" alt="Image 2">
+                <p class="image-label">St. Jerome - Henry Steinwick</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/tour_into_picture/images/fg/inpaint.png" alt="Image 2">
+                <p class="image-label">Foreground Objects Inpainted</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Alpha masking</h4>
+        <p>
+            Another thing we want to take into account is the shapes of the objects themselves.
+            Most objects are not perfect rectangles, so we need some way to "cutout" the natural shape of our foreground objects.
+            We use MATLAB's grabcut function to auto-detect the object and create an alpha mask for it, setting the background transparent.
+            Here is an example of this in action:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/tour_into_picture/images/fg/no_alpha.png" alt="Image 1">
+                <p class="image-label">No grabcut</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div>
+                <img src="media/tour_into_picture/images/fg/alpha.png" alt="Image 1">
+                <p class="image-label">Grabcut</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Calculating Geometry</h4>
+        <p>
+            Finally, we use the homography computed earlier to determine the object's location, and use
+            similar triangle geometry to determine the object's height. Now we have all the information we need to
+            create a new plane parallel to the back wall and place our object on it.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/tour_into_picture/images/fg/fg_done.png" alt="Image 1">
+                <p class="image-label">Foreground Object Example</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Please scroll back up to the views and gifs of the picture tours to observe the inclusion of foreground objects.
+            The effect is particularly noticeable in the traffic cones in the San Francisco image-- some cones were chosen as foreground objects and others were not.
+            The cones that were selected look much better than the ones that were not, as they are no longer treated as part of the ground plane.
+            Another thing to note is that the deeper cones appear to have the same height as the shallower cones, even though the shallower cones look bigger in the image.
+            This is exactly what we hope to see, and perspective geometry prevails yet again.
+        </p>
+    </div>
+
+    <div class="section">
+        <h3>Summary</h3>
+        <p>
+           This project was really fun, but unexpectedly tricky. I faced a lot of issues trying to get the 3D constructions set up correctly,
+            with the orientations of the different planes and correct placements in the 3D space. The foreground objects
+            were a whole other can of worms, as it was quite tricky to calculate the correct placements and heights and map it all into 3D.
+            All in all, I think all the effort was worth it, as the final result might be one of my favorites from this whole semester.
+        </p>
+    </div>
+
+    <div class="section">
+        <br>
+        <h2>Project 2: Light Field Camera</h2>
+        <p>
+            Now we will shift gears into depth refocusing and aperture adjustment using light field data.
+            The datasets used here are very large and will thus not be included here-- only the results.
+            If you desire to see the original datasets in their entirety, please visit this website:
+        </p>
+        <a href="http://lightfield.stanford.edu/lfs.html" target="_blank">Stanford Light Field Archive</a>
+        <p>
+            For this project, I am using the datasets labelled "Chess" and "Tarot Cards and Crystal Ball (small angular extent)".
+            These datasets consist of 17x17 grids of images. Each image is of the same scene, but with a slight shift in either the x or y direction.
+        </p>
+    </div>
+
+    <div class="section">
+        <h3>Part 1: Depth Refocusing</h3>
+        <p>
+            We can use our grids of images to simulate depth refocusing.
+            If we were to simply average over all the images, we would get an image that focuses on a certain region of the image, typically the deepest parts.
+            This is because the slight shifts in the x and y directions cause a significant shift in the foreground objects, but not nearly as much of a shift on the deeper objects.
+            Here is a basic averaging over all the images in the chess dataset and the crystal ball dataset:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/light_field/chess/c/0.0.png" alt="Image 1">
+                <p class="image-label">Chess</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/c/0.0.png" alt="Image 1">
+                <p class="image-label">Crystal Ball</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            We can shift the focus in these images by shifting the images before averaging them.
+            To do this, we compute the (x,y) coordinate shifts of each image, relative to the center image.
+            Then, we can apply varying proportions (c) of this shift to the images and average them.
+            I used proportions from the range [-0.5, 1.0] for both datasets.
+            This has the effect of refocusing on different depths of the images:
+        </p>
+    </div>
+
+    <div class="section">
+        <h4>Chess:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/light_field/chess/c/-0.5.png" alt="Image 1">
+                <p class="image-label">c=-0.5</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/c/-0.4.png" alt="Image 1">
+                <p class="image-label">c=-0.4</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/c/-0.3.png" alt="Image 1">
+                <p class="image-label">c=-0.3</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/c/-0.2.png" alt="Image 1">
+                <p class="image-label">c=-0.2</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/light_field/chess/c/-0.1.png" alt="Image 1">
+                <p class="image-label">c=-0.1</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/c/0.0.png" alt="Image 1">
+                <p class="image-label">c=0.0</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/c/0.1.png" alt="Image 1">
+                <p class="image-label">c=0.1</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/c/0.2.png" alt="Image 1">
+                <p class="image-label">c=0.2</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/light_field/chess/c/0.3.png" alt="Image 1">
+                <p class="image-label">c=0.3</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/c/0.4.png" alt="Image 1">
+                <p class="image-label">c=0.4</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/c/0.5.png" alt="Image 1">
+                <p class="image-label">c=0.5</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/c/0.6.png" alt="Image 1">
+                <p class="image-label">c=0.6</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/light_field/chess/c/0.7.png" alt="Image 1">
+                <p class="image-label">c=0.7</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/c/0.8.png" alt="Image 1">
+                <p class="image-label">c=0.8</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/c/0.9.png" alt="Image 1">
+                <p class="image-label">c=0.9</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/c/1.0.png" alt="Image 1">
+                <p class="image-label">c=1.0</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Crystal Ball:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/light_field/ball/c/-0.5.png" alt="Image 1">
+                <p class="image-label">c=-0.5</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/c/-0.4.png" alt="Image 1">
+                <p class="image-label">c=-0.4</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/c/-0.3.png" alt="Image 1">
+                <p class="image-label">c=-0.3</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/c/-0.2.png" alt="Image 1">
+                <p class="image-label">c=-0.2</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/light_field/ball/c/-0.1.png" alt="Image 1">
+                <p class="image-label">c=-0.1</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/c/0.0.png" alt="Image 1">
+                <p class="image-label">c=0.0</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/c/0.1.png" alt="Image 1">
+                <p class="image-label">c=0.1</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/c/0.2.png" alt="Image 1">
+                <p class="image-label">c=0.2</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/light_field/ball/c/0.3.png" alt="Image 1">
+                <p class="image-label">c=0.3</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/c/0.4.png" alt="Image 1">
+                <p class="image-label">c=0.4</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/c/0.5.png" alt="Image 1">
+                <p class="image-label">c=0.5</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/c/0.6.png" alt="Image 1">
+                <p class="image-label">c=0.6</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/light_field/ball/c/0.7.png" alt="Image 1">
+                <p class="image-label">c=0.7</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/c/0.8.png" alt="Image 1">
+                <p class="image-label">c=0.8</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/c/0.9.png" alt="Image 1">
+                <p class="image-label">c=0.9</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/c/1.0.png" alt="Image 1">
+                <p class="image-label">c=1.0</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Here are some gifs that showcase the refocusing a bit better:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/light_field/chess_c.gif" alt="Image 1">
+                <p class="image-label">Chess</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball_c.gif" alt="Image 1">
+                <p class="image-label">Crystal Ball</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Part 2: Aperture Adjustment</h3>
+        <p>
+            We can also use this dataset to very easily create images that mimic different apertures.
+            To do this, we need to average over different "radii" of the dataset.
+            The smallest aperture corresponds to just the center image by itself.
+            The next smallest aperture corresponds to the average of all images that form a 3x3 grid around the center.
+            We continue this until we reach the largest aperture, which is simply the average of the entire 17x17 grid.
+            Here is what that looks like:
+        </p>
+    </div>
+
+    <div class="section">
+        <h4>Chess:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/light_field/chess/aperture/0.png" alt="Image 1">
+                <p class="image-label">1 image</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/aperture/1.png" alt="Image 1">
+                <p class="image-label">9 images</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/aperture/2.png" alt="Image 1">
+                <p class="image-label">25 images</p>
+            </div>
+        </div>
+    </div>
+
+        <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/light_field/chess/aperture/3.png" alt="Image 1">
+                <p class="image-label">49 images</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/aperture/4.png" alt="Image 1">
+                <p class="image-label">81 images</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/aperture/5.png" alt="Image 1">
+                <p class="image-label">121 images</p>
+            </div>
+        </div>
+    </div>
+
+        <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/light_field/chess/aperture/6.png" alt="Image 1">
+                <p class="image-label">169 images</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/aperture/7.png" alt="Image 1">
+                <p class="image-label">225 images</p>
+            </div>
+            <div>
+                <img src="media/light_field/chess/aperture/8.png" alt="Image 1">
+                <p class="image-label">289 images</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h4>Crystal Ball:</h4>
+    </div>
+
+    <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/light_field/ball/aperture/0.png" alt="Image 1">
+                <p class="image-label">1 image</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/aperture/1.png" alt="Image 1">
+                <p class="image-label">9 images</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/aperture/2.png" alt="Image 1">
+                <p class="image-label">25 images</p>
+            </div>
+        </div>
+    </div>
+
+        <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/light_field/ball/aperture/3.png" alt="Image 1">
+                <p class="image-label">49 images</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/aperture/4.png" alt="Image 1">
+                <p class="image-label">81 images</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/aperture/5.png" alt="Image 1">
+                <p class="image-label">121 images</p>
+            </div>
+        </div>
+    </div>
+
+        <div class="section">
+        <div class="image-row small-image-row">
+            <div>
+                <img src="media/light_field/ball/aperture/6.png" alt="Image 1">
+                <p class="image-label">169 images</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/aperture/7.png" alt="Image 1">
+                <p class="image-label">225 images</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball/aperture/8.png" alt="Image 1">
+                <p class="image-label">289 images</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p>
+            Again, we have some gifs to show off this effect a bit more:
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="image-row">
+            <div>
+                <img src="media/light_field/chess_aperture.gif" alt="Image 1">
+                <p class="image-label">Chess</p>
+            </div>
+            <div>
+                <img src="media/light_field/ball_aperture.gif" alt="Image 1">
+                <p class="image-label">Crystal Ball</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Part 3: Summary</h3>
+        <p>
+            This project showed me that light fields capture a lot of information that is not quite present in conventional camera captures.
+            The directional information encoded into light fields allows for useful and fascinating image manipulations even after the images have been captured,
+            such as the depth-refocusing and aperture adjustment we saw here. These are subtle yet beautiful effects that
+            I feel could be easily overlooked, but they add a lot potential variety into image captures.
+        </p>
+    </div>
+
+    <div class="section">
+        <p>
+            <br>
+            <br>
+            <br>
+            <br>
+        </p>
+    </div>
+
+</body>
+</html>
